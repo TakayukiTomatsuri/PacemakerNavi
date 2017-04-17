@@ -36,7 +36,7 @@ public class NavigationMapsActivity extends FragmentActivity implements OnMapRea
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //デバッグのため起動するとともにプレイスピッカーを表示するため。
+        //デバッグのために、起動するとともにプレイスピッカーを表示する。
         FragmentManager fm = getSupportFragmentManager();
         PlacePickerFragment fragment =
                 (PlacePickerFragment) fm.findFragmentByTag(FRAGTAG);
