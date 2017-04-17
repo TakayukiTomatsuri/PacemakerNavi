@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PacemakerNavi</string>
+    <string name="title_activity_navigation_maps">MainNavigationMap</string>
+</resources>
