@@ -33,6 +33,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 
 import static com.google.android.gms.wearable.DataMap.TAG;
 
+//ナビゲーション用地図画面。
 public class NavigationMapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
 

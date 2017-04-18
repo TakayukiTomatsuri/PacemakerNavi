@@ -3,7 +3,8 @@ package com.example.user1.pacemakernavi;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-//import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+
 
 /**
  * Created by user1 on 2017/04/17.
@@ -22,16 +23,22 @@ public class MainActivity extends Activity {
         // コードからFragmentを追加
 
         // Fragmentを作成します
-        NavigationMapFragment fragment = new NavigationMapFragment();
+        NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
         // Fragmentの追加や削除といった変更を行う際は、Transactionを利用します
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         // 新しく追加を行うのでaddを使用します
         // 他にも、メソッドにはreplace removeがあります
         // メソッドの1つ目の引数は対象のViewGroupのID、2つ目の引数は追加するfragment
-        transaction.add(R.id.container, fragment);
+        //addToBackStackは前の画面に戻る際に必要
+        transaction.add(R.id.container, navigationMapFragment).addToBackStack(null);
+
+        //transaction.commit();
+
+        //目的地選択のPlacePickerを最前面に表示
+        PlacePickerFragment placePickerFragment = new PlacePickerFragment();
+        transaction.add(R.id.container, placePickerFragment).addToBackStack(null);
         // 最後にcommitを使用することで変更を反映します
         transaction.commit();
-
     }
 
 

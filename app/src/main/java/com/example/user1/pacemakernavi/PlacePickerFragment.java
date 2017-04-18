@@ -1,12 +1,13 @@
 package com.example.user1.pacemakernavi;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -18,21 +19,6 @@ import com.google.android.gms.location.places.ui.PlacePicker;
  * Created by user1 on 2017/04/17.
  */
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Sample demonstrating the use of {@link PlacePicker}.
@@ -46,7 +32,9 @@ import java.util.List;
  * @see com.google.android.gms.location.places.ui.PlacePicker
  * @see com.google.android.gms.location.places.Place
  */
-public class PlacePickerFragment extends Fragment  {
+
+//目的地選択用のPlacePicker。
+public class PlacePickerFragment extends Fragment {
 
     private static final String TAG = "PlacePickerSample";
 
@@ -170,6 +158,13 @@ public class PlacePickerFragment extends Fragment  {
             super.onActivityResult(requestCode, resultCode, data);
         }
         // END_INCLUDE(activity_result)
+
+        //戻る処理は特にいらない見たい(自動的に前のFragmentに戻るみたい)
+//        FragmentManager fm = getFragmentManager();
+//        if (fm.getBackStackEntryCount() > 0) {
+//            fm.popBackStack();
+//            return;
+//        }
     }
 
     /**
