@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<!--- NavigationMapFragmentで使うレイアウト -->
+<!--- 以下のfragmentブロックは、NavigationMapFragmentの中にさらに、標準のMapFragmentをネストするためのもの。もっとうまいやり方があるかもしれない...-->
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

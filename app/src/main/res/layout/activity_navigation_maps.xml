@@ -1,3 +1,5 @@
+
+<!--- NavigationMapsActivity.javaで使うレイアウト。サンプルに入ってただけなので今は使わない -->
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:map="http://schemas.android.com/apk/res-auto"

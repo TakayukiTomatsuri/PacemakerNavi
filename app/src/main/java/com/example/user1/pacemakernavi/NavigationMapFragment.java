@@ -24,7 +24,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -40,8 +39,6 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     // Fragmentで表示するViewを作成するメソッド
@@ -60,10 +57,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         //APIレベル17以上でないとgetChildFragmentManager()が使えないが、これの配下にあるFragmentManagerを使わないとダメ。
         MapFragment mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
     }
-
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

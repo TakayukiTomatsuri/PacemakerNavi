@@ -192,6 +192,9 @@ public class PlacePickerFragment extends Fragment {
 //            fm.popBackStack();
 //            return;
 //        }
+
+        //リスナー(今回はMainActivity)のメソッドを呼び出す
+        listener.onPlacePickerFragmentChosen(PlacePicker.getPlace(data, getActivity()));
     }
 
     /**
