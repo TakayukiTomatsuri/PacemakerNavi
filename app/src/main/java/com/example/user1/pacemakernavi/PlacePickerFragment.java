@@ -2,6 +2,7 @@ package com.example.user1.pacemakernavi;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,32 @@ public class PlacePickerFragment extends Fragment {
 
     private static final String TAG = "PlacePickerSample";
 
+    private PlacePickerFragmentListener listener = null;
+    //このPlacePickerのイベント?のリスナー。このアプリではMainActivityを想定している。
+    public interface PlacePickerFragmentListener {
+        void onPlacePickerFragmentChosen(Place chosenPlace);
+    }
+
+    //このFragmentがアタッチされたやつをリスナーとして登録する。
+    //もしそれがPlacePickerFragmentListenerを実装してなければエラー。
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        Activity activity;
+        if (context instanceof Activity){
+            activity=(Activity) context;
+
+            // 実装されてなかったらException吐かせて実装者に伝える
+            if (!(activity instanceof PlacePickerFragmentListener)) {
+                throw new UnsupportedOperationException(
+                        "Listener is not Implementation.");
+            } else {
+                // ここでActivityのインスタンスではなくActivityに実装されたイベントリスナを取得
+                listener = (PlacePickerFragmentListener) activity;
+            }
+        }
+    }
 
     // Buffer used to display list of place types for a place
     private final StringBuffer mPlaceTypeDisplayBuffer = new StringBuffer();
