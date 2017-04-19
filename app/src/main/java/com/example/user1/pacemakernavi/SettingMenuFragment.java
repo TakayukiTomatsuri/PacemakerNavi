@@ -81,6 +81,16 @@ public class SettingMenuFragment extends Fragment{
                 listener.onClickSettingMenuButton(v);
             }
         });
+
+        //案内開始ボタン
+        Button startNavigationButton = (Button)getActivity().findViewById(R.id.startNavigation);
+        startNavigationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getActivity(), "hoge!", Toast.LENGTH_SHORT).show();
+                listener.onClickSettingMenuButton(v);
+            }
+        });
     }
 
     //目的地・出発地の情報をセット

@@ -22,7 +22,11 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     private Place origin = null;    //セットされた出発地
     private boolean isChoosingDistination = true;   //現在、目的地or出発地のどちらをセットしている段階か
 
+    //セッティングメニューはアプリの中で常に一つ
     SettingMenuFragment settingMenuFragment = new SettingMenuFragment();
+    // NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
+    //PlacePickerは選択のたび生成/破棄されるみたいなのでここで生成しない
+    //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,6 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         // コードからFragmentを追加
 
 //        // Fragmentを作成します
-//        NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
 //
         // Fragmentの追加や削除といった変更を行う際は、Transactionを利用します
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -42,7 +45,9 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         //addToBackStackは前の画面に戻る際に必要
 
         //なぜかこいつらが先だとダメ。
-//        transaction.add(R.id.container, navigationMapFragment).addToBackStack(null);
+        NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
+        transaction.add(R.id.container, settingMenuFragment).addToBackStack(null);
+        //transaction.add(R.id.container, navigationMapFragment).addToBackStack(null);
 
         //目的地選択のPlacePickerを最前面に表示
         //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
@@ -50,7 +55,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         //たぶん、ネストされたplacepickerフラグメントから抜ければメニューが表示されるとおもう
 //        transaction.add(R.id.container, placePickerFragment).addToBackStack(null);
 
-        transaction.add(R.id.container, settingMenuFragment).addToBackStack(null);
+
 
         // 最後にcommitしないと反映されない!
         transaction.commit();
@@ -72,11 +77,21 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
 
     //SettingMenuFragment上のボタンが押された時に呼ばれるコールバックメソッド
     public  void onClickSettingMenuButton(View buttonView){
+        if(buttonView.getId()==R.id.startNavigation){
+            Log.i("AAA", "CALL START NAVI");
+            //マップを表示する
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
+            transaction.replace(R.id.container, navigationMapFragment).addToBackStack(null);
+            transaction.commit();
+            return;
+        }
+
         //どのボタンが押されたかを調べ目的地or出発地のどちらを探したいのかを保存
         if(buttonView.getId() == R.id.chooseDestinationButton) isChoosingDistination = true;
         else if(buttonView.getId() == R.id.chooseOriginButton) isChoosingDistination = false;
 
-        //PlacePickerを起動してユーザにプレイスを選択させる
+        //PlacePickerを起動してユーザにプレイスを選択させる(PlacePickerはその都度生成され、プレイスが選択されたあとは破棄されるみたい)
         PlacePickerFragment placePickerFragment = new PlacePickerFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.add(R.id.container, placePickerFragment).addToBackStack(null);
