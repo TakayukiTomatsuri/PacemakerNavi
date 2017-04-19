@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
 
@@ -18,7 +19,7 @@ import com.google.android.gms.location.places.Place;
 //各画面(=Fragment)の切り替えや、仲を取り持つのがこのActivity。
 public class MainActivity extends Activity implements  PlacePickerFragment.PlacePickerFragmentListener, SettingMenuFragment.SettingMenuFragmentListener {
 
-    private Place distination = null;   //セットされた目的地
+    private Place destination = null;   //セットされた目的地
     private Place origin = null;    //セットされた出発地
     private boolean isChoosingDistination = true;   //現在、目的地or出発地のどちらをセットしている段階か
 
@@ -66,7 +67,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         Log.i("AAA", "PlacePicked!");
         //SettingMenu画面の目的地/出発地情報を変更します
         if(isChoosingDistination){
-            distination = chosenPlace;
+            destination = chosenPlace;
             settingMenuFragment.setDestinationInfo(chosenPlace);
         }
         else{
@@ -78,10 +79,18 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     //SettingMenuFragment上のボタンが押された時に呼ばれるコールバックメソッド
     public  void onClickSettingMenuButton(View buttonView){
         if(buttonView.getId()==R.id.startNavigation){
+            if(origin == null || destination == null){
+                Toast.makeText(this, "DEST or ORIGIN is null!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Log.i("AAA", "CALL START NAVI");
             //マップを表示する
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
+            //目的地とか設定(このタイミングでやっていいの？ NavigationMapFragmentのonMapReadyが呼ばれるまえに設定しなくてはならない)
+            navigationMapFragment.destination = destination;
+            navigationMapFragment.origin = origin;
             transaction.replace(R.id.container, navigationMapFragment).addToBackStack(null);
             transaction.commit();
             return;

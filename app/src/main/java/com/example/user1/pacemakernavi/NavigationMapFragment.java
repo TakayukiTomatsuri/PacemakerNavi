@@ -50,6 +50,8 @@ import static com.google.android.gms.wearable.DataMap.TAG;
 //ナビゲーション用地図画面。
 public class NavigationMapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
+    public Place destination;
+    public Place origin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,32 +84,41 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+
+        setRoute(destination, origin);
     }
 
 
     //-----目的地までのルートを取得するための機能たち----//
     //ルートを設定し描画する
-    public void onSetRoute(Place destination, Place origin){
+    private void setRoute(Place destination, Place origin){
+        //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
             Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
             return;
         }
+        if(mMap == null) Log.i("MAP", "mMap == null!");
+
+        Log.i("MAP", "addMarker");
         mMap.addMarker(new MarkerOptions().position(destination.getLatLng()).title("DEST"));
         mMap.addMarker(new MarkerOptions().position(origin.getLatLng()).title("ORIGIN"));
+        Log.i("MAP", "addedMarker");
+        LatLng originLatLng = origin.getLatLng();
+        LatLng destLatLng = destination.getLatLng();
 
-            LatLng originLatLng = origin.getLatLng();
-            LatLng destLatLng = destination.getLatLng();
+        // Getting URL to the Google Directions API
+        String url = getUrl(originLatLng, destLatLng);
+        Log.d("onMapClick", url.toString());
+        FetchUrl FetchUrl = new FetchUrl();
 
-            // Getting URL to the Google Directions API
-            String url = getUrl(originLatLng, destLatLng);
-            Log.d("onMapClick", url.toString());
-            FetchUrl FetchUrl = new FetchUrl();
-
-            // Start downloading json data from Google Directions API
-            FetchUrl.execute(url);
-            //move map camera
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(originLatLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        // Start downloading json data from Google Directions API
+        FetchUrl.execute(url);
+        //なぜかずれる！！！！
+        //move map camera
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(originLatLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
     }
 
     //https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
