@@ -63,6 +63,13 @@ public class NavigationControlActivity  extends Activity{
         navigationMapFragment.originLatLng = origin;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        navigationMapFragment.mMap.setMyLocationEnabled(true);
+    }
+
 
 
 

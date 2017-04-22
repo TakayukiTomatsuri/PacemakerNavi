@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             //ナビゲーション画面に移行する
             Intent intent = new Intent(MainActivity.this, NavigationControlActivity.class);
 
-            //設定されてない時のデフォルトの目的地
+            //設定されてない時のデフォルトのと出発地
             if(origin == null || destination == null){
                 Toast.makeText(this, "DEST or ORIGIN is null!", Toast.LENGTH_SHORT).show();
 

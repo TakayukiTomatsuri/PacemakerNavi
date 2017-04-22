@@ -4,6 +4,7 @@ package com.example.user1.pacemakernavi;
  * Created by user1 on 2017/04/17.
  */
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +21,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import android.Manifest;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -51,7 +54,7 @@ import static com.google.android.gms.wearable.DataMap.TAG;
 
 //ナビゲーション画面用の地図画面。ナビゲーション画面の上半分をこれで構成します。
 public class NavigationMapFragment extends Fragment implements OnMapReadyCallback {
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     public Place destination;
     public Place origin;
     public LatLng destLatLng;
@@ -80,6 +83,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+    final int REQUEST_LOCATION =1;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -89,7 +93,6 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
 
 
         //現在地表示をオンにしたいがパーミッション関係がよくわからないせいでできない
@@ -102,16 +105,40 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 //            // to handle the case where the user grants the permission. See the documentation
 //            // for ActivityCompat#requestPermissions for more details.
 //            getActivity().requestPermissions(this, PERMISSIONS, RC_LOCATION_PERMISSIONS);
-//            mMap.setMyLocationEnabled(true);
+//
 //
 //            return;
 //        }
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+//            mMap.setMyLocationEnabled(true);
+            return;
+        }
+
 
         //setRoute(destination, origin);
         //DEBUG
         //setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
         setRoute(destLatLng, originLatLng);
     }
+
+//    @Override
+//
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                                           int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        mMap.setMyLocationEnabled(true);
+//    }
 
 
     //-----目的地までのルートを取得するための機能たち----//
