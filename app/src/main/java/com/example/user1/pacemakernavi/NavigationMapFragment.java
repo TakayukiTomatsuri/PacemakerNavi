@@ -105,7 +105,9 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 //            return;
 //        }
 
-        setRoute(destination, origin);
+        //setRoute(destination, origin);
+        //DEBUG
+        setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
     }
 
 
@@ -115,7 +117,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
             Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
-            return;
+            //return;
         }
         if(mMap == null) Log.i("MAP", "mMap == null!");
 
@@ -125,6 +127,35 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         Log.i("MAP", "addedMarker");
         LatLng originLatLng = origin.getLatLng();
         LatLng destLatLng = destination.getLatLng();
+
+        // Getting URL to the Google Directions API
+        String url = getUrl(originLatLng, destLatLng);
+        Log.d("onMapClick", url.toString());
+        FetchUrl FetchUrl = new FetchUrl();
+
+        // Start downloading json data from Google Directions API
+        FetchUrl.execute(url);
+        //なぜかずれる！！！！
+        //move map camera
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(originLatLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
+    }
+
+    //デバッグ用
+    private void setRoute(LatLng destination, LatLng origin){
+        //目的地/出発地が設定されてない
+        if(destination == null || origin ==null ) {
+            Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
+            //return;
+        }
+        if(mMap == null) Log.i("MAP", "mMap == null!");
+
+        Log.i("MAP", "addMarker");
+
+        Log.i("MAP", "addedMarker");
+        LatLng originLatLng = origin;
+        LatLng destLatLng = destination;
 
         // Getting URL to the Google Directions API
         String url = getUrl(originLatLng, destLatLng);
@@ -228,6 +259,15 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
             ParserTask parserTask = new ParserTask();
 
+            //追加ーーーーーー
+            Log.d("NaviMap", "START GHOST");
+            try {
+                GhostRendererOnMapService ghost = new GhostRendererOnMapService(mMap);
+                ghost.execute(new JSONObject(result));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            //追加ここまでーーーー
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
 

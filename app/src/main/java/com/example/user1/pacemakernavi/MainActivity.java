@@ -14,9 +14,7 @@ import com.google.android.gms.location.places.Place;
  * Created by user1 on 2017/04/17.
  */
 
-//このアプリの全てを制御するActivity。
-//各画面のレイアウトと処理はFragmentで持ちます。
-//各画面(=Fragment)の切り替えや、仲を取り持つのがこのActivity。
+//目的地設定などをします
 public class MainActivity extends Activity implements  PlacePickerFragment.PlacePickerFragmentListener, SettingMenuFragment.SettingMenuFragmentListener {
 
     private Place destination = null;   //セットされた目的地
@@ -25,7 +23,6 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
 
     //セッティングメニューはアプリの中で常に一つ
     SettingMenuFragment settingMenuFragment = new SettingMenuFragment();
-    // NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
     //PlacePickerは選択のたび生成/破棄されるみたいなのでここで生成しない
     //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
 
@@ -36,27 +33,10 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         setContentView(R.layout.activity_main);
         // コードからFragmentを追加
 
-//        // Fragmentを作成します
-//
         // Fragmentの追加や削除といった変更を行う際は、Transactionを利用します
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        // 新しく追加を行うのでaddを使用します
-        // 他にも、メソッドにはreplace removeがあります
-        // メソッドの1つ目の引数は対象のViewGroupのID、2つ目の引数は追加するfragment
-        //addToBackStackは前の画面に戻る際に必要
 
-        //なぜかこいつらが先だとダメ。
-        NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
         transaction.add(R.id.container, settingMenuFragment).addToBackStack(null);
-        //transaction.add(R.id.container, navigationMapFragment).addToBackStack(null);
-
-        //目的地選択のPlacePickerを最前面に表示
-        //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
-        //なぜかこいつらが先だとダメ。(たぶん、PlacePickerFragmentのなかでさらにPlacePickerのフラグメントを作成しているから？)
-        //たぶん、ネストされたplacepickerフラグメントから抜ければメニューが表示されるとおもう
-//        transaction.add(R.id.container, placePickerFragment).addToBackStack(null);
-
-
 
         // 最後にcommitしないと反映されない!
         transaction.commit();
@@ -84,7 +64,6 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
 
                 //return;
             }
-
             Log.i("AAA", "CALL START NAVI");
             //マップを表示する
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
