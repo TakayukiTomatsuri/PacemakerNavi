@@ -81,7 +81,8 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         if(buttonView.getId()==R.id.startNavigation){
             if(origin == null || destination == null){
                 Toast.makeText(this, "DEST or ORIGIN is null!", Toast.LENGTH_SHORT).show();
-                return;
+
+                //return;
             }
 
             Log.i("AAA", "CALL START NAVI");

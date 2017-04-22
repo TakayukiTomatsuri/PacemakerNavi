@@ -4,6 +4,8 @@ package com.example.user1.pacemakernavi;
  * Created by user1 on 2017/04/19.
  */
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -44,7 +46,10 @@ public class DataParser {
                         String polyline = "";
                         polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
                         List<LatLng> list = decodePoly(polyline);
-
+                        //追加---
+                        Log.d("DataParser", "this Poly line's length(==distance): " + jSteps.getJSONObject(k).getJSONObject("distance").getInt("value"));
+                        //Log.d("DataParser", "distance: " + ((JSONObject)((JSONObject)jSteps.get(k)).get("distance")).get("points"));
+                        //追加ここまで---
                         /** Traversing all points */
                         for(int l=0;l<list.size();l++){
                             HashMap<String, String> hm = new HashMap<>();
@@ -101,6 +106,11 @@ public class DataParser {
                     (((double) lng / 1E5)));
             poly.add(p);
         }
+
+        //追加---
+        Log.d("DataParser", "This polyline haves ...points: " + poly.size());
+
+        //追加ここまで---
 
         return poly;
     }

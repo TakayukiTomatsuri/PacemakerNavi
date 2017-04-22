@@ -6,9 +6,11 @@ package com.example.user1.pacemakernavi;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.nfc.Tag;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -85,6 +87,23 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.getUiSettings().setZoomControlsEnabled(true);
+
+
+
+        //現在地表示をオンにしたいがパーミッション関係がよくわからないせいでできない
+//        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            getActivity().requestPermissions(this, PERMISSIONS, RC_LOCATION_PERMISSIONS);
+//            mMap.setMyLocationEnabled(true);
+//
+//            return;
+//        }
 
         setRoute(destination, origin);
     }
@@ -231,6 +250,9 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
             try {
                 jObject = new JSONObject(jsonData[0]);
                 Log.d("ParserTask",jsonData[0].toString());
+                //追加---
+                Log.d("ParserTask", "steps count:"+String.valueOf(jObject.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps").length()));
+                //追加ここまで----
                 DataParser parser = new DataParser();
                 Log.d("ParserTask", parser.toString());
 
@@ -259,7 +281,9 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
                 // Fetching i-th route
                 List<HashMap<String, String>> path = result.get(i);
-
+                //追加---
+                Log.d("ParserTask", "route polyline(==All of Route) point count "+String.valueOf(path.size()));
+                //追加ここまで----
                 // Fetching all the points in i-th route
                 for (int j = 0; j < path.size(); j++) {
                     HashMap<String, String> point = path.get(j);
