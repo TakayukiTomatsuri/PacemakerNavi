@@ -2,6 +2,7 @@ package com.example.user1.pacemakernavi;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -59,20 +60,29 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     //SettingMenuFragment上のボタンが押された時に呼ばれるコールバックメソッド
     public  void onClickSettingMenuButton(View buttonView){
         if(buttonView.getId()==R.id.startNavigation){
+            Log.i("MainActivity", "CALL START NAVI");
+            //ナビゲーション画面に移行する
+            Intent intent = new Intent(MainActivity.this, NavigationControlActivity.class);
+
+            //設定されてない時のデフォルトの目的地
             if(origin == null || destination == null){
                 Toast.makeText(this, "DEST or ORIGIN is null!", Toast.LENGTH_SHORT).show();
 
-                //return;
+                intent.putExtra("DestLat", 36.37202);
+                intent.putExtra("DestLng", 140.475858);
+                intent.putExtra("OriginLat", 36.443232);
+                intent.putExtra("OriginLng", 140.501526);
+                startActivity(intent);
+                return;
             }
-            Log.i("AAA", "CALL START NAVI");
-            //マップを表示する
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            NavigationMapFragment navigationMapFragment = new NavigationMapFragment();
-            //目的地とか設定(このタイミングでやっていいの？ NavigationMapFragmentのonMapReadyが呼ばれるまえに設定しなくてはならない)
-            navigationMapFragment.destination = destination;
-            navigationMapFragment.origin = origin;
-            transaction.replace(R.id.container, navigationMapFragment).addToBackStack(null);
-            transaction.commit();
+
+            //ナビゲーションに目的地と出発地の座標を渡す(オブジェクトのまま渡したいがちょっと面倒なので)
+            intent.putExtra("DestLat", destination.getLatLng().latitude);
+            intent.putExtra("DestLng", destination.getLatLng().longitude);
+            intent.putExtra("OriginLat", origin.getLatLng().latitude);
+            intent.putExtra("OriginLng", origin.getLatLng().longitude);
+            startActivity(intent);
+
             return;
         }
 

@@ -49,11 +49,13 @@ import java.util.List;
 
 import static com.google.android.gms.wearable.DataMap.TAG;
 
-//ナビゲーション用地図画面。
+//ナビゲーション画面用の地図画面。ナビゲーション画面の上半分をこれで構成します。
 public class NavigationMapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     public Place destination;
     public Place origin;
+    public LatLng destLatLng;
+    public LatLng originLatLng;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,7 +109,8 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
         //setRoute(destination, origin);
         //DEBUG
-        setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
+        //setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
+        setRoute(destLatLng, originLatLng);
     }
 
 
@@ -152,7 +155,8 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         if(mMap == null) Log.i("MAP", "mMap == null!");
 
         Log.i("MAP", "addMarker");
-
+        mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
+        mMap.addMarker(new MarkerOptions().position(origin).title("ORIGIN"));
         Log.i("MAP", "addedMarker");
         LatLng originLatLng = origin;
         LatLng destLatLng = destination;
@@ -259,6 +263,9 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
             ParserTask parserTask = new ParserTask();
 
+            // Invokes the thread for parsing the JSON data
+            parserTask.execute(result);
+
             //追加ーーーーーー
             Log.d("NaviMap", "START GHOST");
             try {
@@ -268,8 +275,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
                 e.printStackTrace();
             }
             //追加ここまでーーーー
-            // Invokes the thread for parsing the JSON data
-            parserTask.execute(result);
+
 
         }
     }

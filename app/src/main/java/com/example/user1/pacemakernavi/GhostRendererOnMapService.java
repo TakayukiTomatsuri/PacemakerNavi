@@ -28,6 +28,8 @@ import java.util.List;
  * Created by user1 on 2017/04/22.
  */
 
+//時間経過にしたがって、ゴーストの軌跡を伸ばしていく。
+//伸ばすスピードは、ステップにかかる時間と、ステップを表すポリラインに含まれる点の数によって変えていく。(下のdoInBackground内のintervalTimeの定義を参照)
 public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOptions, String> {
     GoogleMap mMap = null;
 
@@ -57,7 +59,7 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
                 //エンコードされたポリラインをStringからLatLngの配列にデコード
                 List<LatLng> polylinePoints = DataParser.decodePoly(encodedPolyline);
 
-                //更新までの時間。(そのステップにかかる時間)/(そのステップに含まれるポリラインの点の数)
+                //更新までの間隔。(そのステップにかかる時間)/(そのステップに含まれるポリラインの点の数)をステップごとに変える。
                 int intervalTime = time / polylinePoints.size() * 1000;
                 Log.d("GHOST", "interval: "+intervalTime);
 
@@ -65,7 +67,6 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
                 for (int pointsIndex = 0; pointsIndex < polylinePoints.size(); pointsIndex++) {
                     Log.d("GHOST", "addPoint  stepIndex: " + stepsIndex +  " /"+ jsonSteps.length() +" pointIndex: " +pointsIndex +" /" + polylinePoints.size());
                     //一定時間待ってポリラインに点を追加
-//                    wait(intervalTime);
                     Thread.sleep(intervalTime);
                     polyline.add(polylinePoints.get(pointsIndex));
                     //画面更新
@@ -89,7 +90,7 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
     // 進捗状況をUIに反映するための処理(UIスレッド)
     @Override
     protected void onProgressUpdate(PolylineOptions... polyline) {
-        // progressDialogなどで進捗表示したりする
+        // ポリラインを伸ばす
         mMap.addPolyline(polyline[0]);
     }
 

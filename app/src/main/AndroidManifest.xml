@@ -36,7 +36,7 @@
             android:value="AIzaSyDU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58" />
 
         <activity
-            android:name=".NavigationControlActivity"
+            android:name=".MainActivity"
             android:label="@string/title_activity_navigation_maps" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,6 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".NavigationControlActivity"></activity>
     </application>
 
 </manifest>
