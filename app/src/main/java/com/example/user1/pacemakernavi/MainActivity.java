@@ -1,9 +1,12 @@
 package com.example.user1.pacemakernavi;
 
+import android.*;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -21,7 +24,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     private Place destination = null;   //セットされた目的地
     private Place origin = null;    //セットされた出発地
     private boolean isChoosingDistination = true;   //現在、目的地or出発地のどちらをセットしている段階か
-
+    final int REQUEST_LOCATION = 1;
     //セッティングメニューはアプリの中で常に一つ
     SettingMenuFragment settingMenuFragment = new SettingMenuFragment();
     //PlacePickerは選択のたび生成/破棄されるみたいなのでここで生成しない
@@ -33,6 +36,14 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
 
         setContentView(R.layout.activity_main);
         // コードからFragmentを追加
+
+        //Android6 からは重要なパーミッションはインストール時には与えられない！実行時にお伺いを立ててイチイチ許可してもらう必要がある。
+        //ちなみに、マップ画面に遷移するときに許可を求めてもいいが、このすぐ後に許可が必要な行動がきてしまうとonRequestPermissionsResultからやり直してあげたりしなくちゃならないので面倒っぽいのでこの画面で最初にやっておく
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+              ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        }
 
         // Fragmentの追加や削除といった変更を行う際は、Transactionを利用します
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -97,6 +108,13 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         // 最後にcommitを使用することで変更を反映
         transaction.commit();
 
+    }
+
+    //Android6からはRuntimePermissionとかいって、重要なパーミッションは実行時に許可してもらう。それのリクエストをした時に、結果が判明したあとに呼ばれるコールバックメソッド
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 

@@ -63,10 +63,14 @@ public class NavigationControlActivity  extends Activity{
         navigationMapFragment.originLatLng = origin;
     }
 
+    //パーミッションをリクエストしたとき、終わった後に呼ばれるメソッド。ここで結果を確認する。
+    //NavigationMapFragmentのなかでRuntimePermission(今回はACCESS_FINE_LOCATION)が必要だった。Activityに書くものなのでこちらに書いた。
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("NavigationActivity", "ACCESS_FINE_LOCATION is permitted");
+        //地図画面の現在地表示をオン
         navigationMapFragment.mMap.setMyLocationEnabled(true);
     }
 

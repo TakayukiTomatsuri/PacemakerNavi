@@ -94,46 +94,32 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-
-        //現在地表示をオンにしたいがパーミッション関係がよくわからないせいでできない
-//        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            getActivity().requestPermissions(this, PERMISSIONS, RC_LOCATION_PERMISSIONS);
-//
-//
-//            return;
-//        }
-
-        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION);
-//            mMap.setMyLocationEnabled(true);
-            return;
-        }
-
-
         //setRoute(destination, origin);
         //DEBUG
         //setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
+
         setRoute(destLatLng, originLatLng);
+
+        //アプリ起動時にMainActivityのほうで許可を要請する画面が出るので許可もらってるはずだが、もしもらってなかった時用。
+        //現在地取得に必要なパーミッションを確認する。結果はActivityにおいてonRequestPermissionsResultというコールバックメソッドが呼ばれるので確認。
+        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //許可されてない場合は要請する
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+            //結果待ちのためにreturnが必須。
+            //returnしないと次にすすんでしまい、パーミッションが必要な行動がパーミッション無しの状態で実行され、落ちる。
+            //よってこういう直前にパーミッション要求する場合はonRequestPermissionsResultなどでもういっかいやり直さなくてはならない。面倒。
+            //今回は、アプリ起動時にもパーミッションを確認するようにしてある。ので、こっちの画面の実装は適当。(一応、ちゃんと動くようには作ってある)
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+
     }
 
+
+    //パーミッションをリクエストしたとき、終わった後に呼ばれるメソッド。この中で結果を確認するが、FragmentでなくてActivityに書くもの。
 //    @Override
-//
 //    public void onRequestPermissionsResult(int requestCode, String[] permissions,
 //                                           int[] grantResults) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -172,7 +158,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
     }
 
-    //デバッグ用
+    //デバッグ用。PlaceではなくLatLngで目的地・出発地を渡す
     private void setRoute(LatLng destination, LatLng origin){
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
