@@ -22,6 +22,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -179,15 +181,7 @@ public class NavigationControlActivity extends Activity implements
         if (currentLocation != null && currentLocation.getTime() > 20000) {
             location = currentLocation;
 
-//            textLog += "---------- onConnected \n";
-//            textLog += "Latitude=" + String.valueOf(location.getLatitude()) + "\n";
-//            textLog += "Longitude=" + String.valueOf(location.getLongitude()) + "\n";
-//            textLog += "Accuracy=" + String.valueOf(location.getAccuracy()) + "\n";
-//            textLog += "Altitude=" + String.valueOf(location.getAltitude()) + "\n";
-//            textLog += "Time=" + String.valueOf(location.getTime()) + "\n";
-//            textLog += "Speed=" + String.valueOf(location.getSpeed()) + "\n";
-//            textLog += "Bearing=" + String.valueOf(location.getBearing()) + "\n";
-//            textView.setText(textLog);
+
 
         } else {
             // バックグラウンドから戻ってしまうと例外が発生する場合がある
@@ -216,20 +210,10 @@ public class NavigationControlActivity extends Activity implements
         }
     }
 
+    //位置が変わったら呼ばれるメソッド
     @Override
     public void onLocationChanged(Location location) {
         lastLocationTime = location.getTime() - lastLocationTime;
-
-//        textLog += "---------- onLocationChanged \n";
-//        textLog += "Latitude=" + String.valueOf(location.getLatitude()) + "\n";
-//        textLog += "Longitude=" + String.valueOf(location.getLongitude()) + "\n";
-//        textLog += "Accuracy=" + String.valueOf(location.getAccuracy()) + "\n";
-//        textLog += "Altitude=" + String.valueOf(location.getAltitude()) + "\n";
-//        textLog += "Time=" + String.valueOf(location.getTime()) + "\n";
-//        textLog += "Speed=" + String.valueOf(location.getSpeed()) + "\n";
-//        textLog += "Bearing=" + String.valueOf(location.getBearing()) + "\n";
-//        textLog += "time= " + String.valueOf(lastLocationTime) + " msec \n";
-//        textView.setText(textLog);
     }
 
 
@@ -265,6 +249,21 @@ public class NavigationControlActivity extends Activity implements
         Log.d("NavigationActivity", "ACCESS_FINE_LOCATION is permitted");
         //地図画面の現在地表示をオン
         navigationMapFragment.mMap.setMyLocationEnabled(true);
+    }
+
+    //インテントが投げられるとこれが呼ばれる
+    //主に、NavigationInformationFragmentのほうで設定したGeoFenceに入ったときに来ることになる
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Log.d("onNewIntent", String.valueOf(intent));
+        //ジオフェンスのイベントのタイプを判別する
+        GeofencingEvent event = GeofencingEvent.fromIntent(intent);
+        int transitionType = event.getGeofenceTransition();
+        if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            navigationInformationFragment.changeSteps();
+        }
     }
 
 
@@ -378,9 +377,14 @@ public class NavigationControlActivity extends Activity implements
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            //マップにルート情報を設定(NavigationMapFragmentにてMapの準備ができてない=oMapReadyがまだ呼ばれてない時に呼ぶとエラー)
+
             try {
+                //マップにルート情報を設定(NavigationMapFragmentにてMapの準備ができてない=oMapReadyがまだ呼ばれてない時に呼ぶとエラー)
                 navigationMapFragment.setRoute(destination, origin, new JSONObject(result));
+                //インフォーメーション部(ナビゲーション画面の下半分)に、行程(xx交差点で曲がる)を設定する
+                navigationInformationFragment.addGeofences(new JSONObject(result));
+                //右に曲がるとかそういう指示を表示させるための準備
+                navigationInformationFragment.changeSteps();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
