@@ -55,10 +55,6 @@ import static com.google.android.gms.wearable.DataMap.TAG;
 //ナビゲーション画面用の地図画面。ナビゲーション画面の上半分をこれで構成します。
 public class NavigationMapFragment extends Fragment implements OnMapReadyCallback {
     public GoogleMap mMap;
-    public Place destination;
-    public Place origin;
-    public LatLng destLatLng;
-    public LatLng originLatLng;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,7 +69,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         return inflater.inflate(R.layout.fragment_navigation_map, container, false);
     }
 
-    //MapのFragmentが入るべき場所をレイアウトから探すには、レイアウトからビューが作成されたあとでなくてはならないのでonViewCreatedで実行する必要がある
+    //MapのFragmentが入るべき場所をレイアウトから探すことは、レイアウトからビューが作成されたあとでなくてはならないのでonViewCreatedで実行する必要がある
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -94,12 +90,6 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        //setRoute(destination, origin);
-        //DEBUG
-        //setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
-
-        setRoute(destLatLng, originLatLng);
-
         //アプリ起動時にMainActivityのほうで許可を要請する画面が出るので許可もらってるはずだが、もしもらってなかった時用。
         //現在地取得に必要なパーミッションを確認する。結果はActivityにおいてonRequestPermissionsResultというコールバックメソッドが呼ばれるので確認。
         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -114,7 +104,6 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
             return;
         }
         mMap.setMyLocationEnabled(true);
-
     }
 
 
@@ -129,7 +118,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
     //-----目的地までのルートを取得するための機能たち----//
     //ルートを設定し描画する
-    private void setRoute(Place destination, Place origin){
+    public void setRoute(Place destination, Place origin, JSONObject routeResult) {
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
             Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
@@ -137,29 +126,24 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         }
         if(mMap == null) Log.i("MAP", "mMap == null!");
 
-        Log.i("MAP", "addMarker");
+        Log.i("NaviMapFragment", "addMarker");
         mMap.addMarker(new MarkerOptions().position(destination.getLatLng()).title("DEST"));
         mMap.addMarker(new MarkerOptions().position(origin.getLatLng()).title("ORIGIN"));
-        Log.i("MAP", "addedMarker");
-        LatLng originLatLng = origin.getLatLng();
-        LatLng destLatLng = destination.getLatLng();
+        Log.i("NaviMapFragment", "addedMarker");
 
-        // Getting URL to the Google Directions API
-        String url = getUrl(originLatLng, destLatLng);
-        Log.d("onMapClick", url.toString());
-        FetchUrl FetchUrl = new FetchUrl();
+        ParserTask parserTask = new ParserTask();
+        // Invokes the thread for parsing the JSON data
+        parserTask.execute(routeResult.toString());
 
-        // Start downloading json data from Google Directions API
-        FetchUrl.execute(url);
         //なぜかずれる！！！！
         //move map camera
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(originLatLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(origin.getLatLng()));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
     }
 
     //デバッグ用。PlaceではなくLatLngで目的地・出発地を渡す
-    private void setRoute(LatLng destination, LatLng origin){
+    public void setRoute(LatLng destination, LatLng origin, JSONObject routeResult) {
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
             Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
@@ -167,132 +151,24 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         }
         if(mMap == null) Log.i("MAP", "mMap == null!");
 
-        Log.i("MAP", "addMarker");
+        Log.i("NaviMapFragment", "addMarker");
         mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
         mMap.addMarker(new MarkerOptions().position(origin).title("ORIGIN"));
-        Log.i("MAP", "addedMarker");
-        LatLng originLatLng = origin;
-        LatLng destLatLng = destination;
+        Log.i("NaviMapFragment", "addedMarker");
 
-        // Getting URL to the Google Directions API
-        String url = getUrl(originLatLng, destLatLng);
-        Log.d("onMapClick", url.toString());
-        FetchUrl FetchUrl = new FetchUrl();
+        ParserTask parserTask = new ParserTask();
+        // Invokes the thread for parsing the JSON data
+        parserTask.execute(routeResult.toString());
 
-        // Start downloading json data from Google Directions API
-        FetchUrl.execute(url);
         //なぜかずれる！！！！
         //move map camera
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(originLatLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
     }
 
-    //https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
+    //以下は、　https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
     //からのコピペ
-
-    //generate URL
-    private String getUrl(LatLng origin, LatLng dest) {
-        // Origin of route
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-        // Destination of route
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-        // Sensor enabled
-        String sensor = "sensor=false";
-        // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor;
-        // Output format
-        String output = "json";
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-        return url;
-    }
-
-    /**
-     * A method to download json data from url
-     */
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(strUrl);
-
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            // Connecting to url
-            urlConnection.connect();
-
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb = new StringBuffer();
-
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            data = sb.toString();
-            Log.d("downloadUrl", data.toString());
-            br.close();
-
-        } catch (Exception e) {
-            Log.d("Exception", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
-    }
-
-
-    // Fetches data from url passed
-    private class FetchUrl extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... url) {
-
-            // For storing data from web service
-            String data = "";
-
-            try {
-                // Fetching the data from web service
-                data = downloadUrl(url[0]);
-                Log.d("Background Task data", data.toString());
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            ParserTask parserTask = new ParserTask();
-
-            // Invokes the thread for parsing the JSON data
-            parserTask.execute(result);
-
-            //追加ーーーーーー
-            Log.d("NaviMap", "START GHOST");
-            try {
-                GhostRendererOnMapService ghost = new GhostRendererOnMapService(mMap);
-                ghost.execute(new JSONObject(result));
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            //追加ここまでーーーー
-
-
-        }
-    }
-
 
     /**
      * A class to parse the Google Places in JSON format
