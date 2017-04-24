@@ -58,7 +58,8 @@ import java.util.concurrent.TimeUnit;
 
 
 //ナビゲーション画面のコントローラとなるアクティビティです
-//位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentとNavigationInformationFragmentに渡します。
+//位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentと　NavigationInformationFragmentに渡します。
+//FusedLocationなんとかが使われてるけど、現在使っていません。(ルートの案内にGeoFenceを使うように変更したため)
 public class NavigationControlActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -89,16 +90,10 @@ public class NavigationControlActivity extends Activity implements
         destination = new LatLng(intent.getDoubleExtra("DestLat", 0.0), intent.getDoubleExtra("DestLng", 0.0));
         origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
 
-
         //画面に配置されてるフラグメントを取得
         FragmentManager fragmentManager  = getFragmentManager();
          navigationMapFragment =  (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
          navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
-
-        //マップ側に目的地と出発地をセット
-        //TODO:マップ側で経路探索しているので、制御用アクティビティ側で経路探索を一括して行うように変更したほうがいい
-//        navigationMapFragment.destLatLng = destination;
-//        navigationMapFragment.originLatLng = origin;
 
         // LocationRequest を生成して精度、インターバルを設定
         locationRequest = LocationRequest.create();
@@ -114,35 +109,17 @@ public class NavigationControlActivity extends Activity implements
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        Log.d("LocationActivity", "mGoogleApiClient");
+        Log.d("NaviControlActivity", "mGoogleApiClient");
 
         //FusedLocation開始
         startFusedLocation();
 
         //ルートのセットを開始
         this.setRoute(destination, origin);
-
-//        // 測位開始
-//        Button buttonStart = (Button)findViewById(R.id.button_start);
-//        buttonStart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startFusedLocation();
-//            }
-//        });
-//
-//        // 測位終了
-//        Button buttonStop = (Button)findViewById(R.id.button_stop);
-//        buttonStop.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                stopFusedLocation();
-//            }
-//        });
     }
 
     private void startFusedLocation() {
-        Log.d("LocationActivity", "onStart");
+        Log.d("NaviControlActivity", "onStart");
 
         // Connect the client.
         if (!mResolvingError) {
@@ -171,8 +148,6 @@ public class NavigationControlActivity extends Activity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d("LocationActivity", "onConnected");
-
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -180,8 +155,6 @@ public class NavigationControlActivity extends Activity implements
 
         if (currentLocation != null && currentLocation.getTime() > 20000) {
             location = currentLocation;
-
-
 
         } else {
             // バックグラウンドから戻ってしまうと例外が発生する場合がある
@@ -241,13 +214,15 @@ public class NavigationControlActivity extends Activity implements
     }
 
     //パーミッションをリクエストしたとき、終わった後に呼ばれるメソッド。ここで結果を確認する。
-    //NavigationMapFragmentのなかでRuntimePermission(今回はACCESS_FINE_LOCATION)が必要だった。Activityに書くものなのでこちらに書いた。
+    //NavigationMapFragmentのなかでRuntimePermission(今回はACCESS_FINE_LOCATION)が必要なのでそちらで要求している。
+    //Fragmentには書けずにActivityで実装する必要があるみたい
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.d("NavigationActivity", "ACCESS_FINE_LOCATION is permitted");
         //地図画面の現在地表示をオン
+        //TODO: パーミッションチェックをしろとの警告が出るが消し方不明。してるつもりなのに...
         navigationMapFragment.mMap.setMyLocationEnabled(true);
     }
 
@@ -262,6 +237,7 @@ public class NavigationControlActivity extends Activity implements
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         int transitionType = event.getGeofenceTransition();
         if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            //右左折などの指示を進める
             navigationInformationFragment.changeSteps();
         }
     }
@@ -273,7 +249,7 @@ public class NavigationControlActivity extends Activity implements
 
     //ルートを設定する
     private void setRoute(LatLng destination, LatLng origin) {
-        //目的地/出発地が設定されてない
+        //目的地/出発地が設定されてない場合
         if (destination == null || origin == null) {
             Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
             //return;
@@ -377,7 +353,6 @@ public class NavigationControlActivity extends Activity implements
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-
             try {
                 //マップにルート情報を設定(NavigationMapFragmentにてMapの準備ができてない=oMapReadyがまだ呼ばれてない時に呼ぶとエラー)
                 navigationMapFragment.setRoute(destination, origin, new JSONObject(result));
@@ -389,7 +364,7 @@ public class NavigationControlActivity extends Activity implements
                 e.printStackTrace();
             }
 
-            //ゴーストを描画してくれるスレッド(であってる?)を起動
+            //ゴーストを描画してくれるスレッドを起動
             Log.d("NaviMap", "START GHOST");
             try {
                 GhostRendererOnMapService ghost = new GhostRendererOnMapService(navigationMapFragment.mMap);

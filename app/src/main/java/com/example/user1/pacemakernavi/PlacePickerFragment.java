@@ -66,19 +66,6 @@ public class PlacePickerFragment extends Fragment {
         }
     }
 
-    // Buffer used to display list of place types for a place
-    private final StringBuffer mPlaceTypeDisplayBuffer = new StringBuffer();
-
-//    // Tags for cards
-//    private static final String CARD_INTRO = "INTRO";
-//    private static final String CARD_PICKER = "PICKER";
-//    private static final String CARD_DETAIL = "DETAIL";
-
-    /**
-     * Action to launch the PlacePicker from a card. Identifies the card action.
-     */
-    private static final int ACTION_PICK_PLACE = 1;
-
     /**
      * Request code passed to the PlacePicker intent to identify its result when it returns.
      */
@@ -164,21 +151,10 @@ public class PlacePickerFragment extends Fragment {
                     attribution = "";
                 }
 
-//                // Update data on card.
-//                getCardStream().getCard(CARD_DETAIL)
-//                        .setTitle(name.toString())
-//                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
-//                                attribution));
-
                 // Print data to debug log
                 Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
 
-//                // Show the card.
-//                getCardStream().showCard(CARD_DETAIL);
-
             } else {
-//                // User has not selected a place, hide the card.
-//                getCardStream().hideCard(CARD_DETAIL);
             }
 
         } else {

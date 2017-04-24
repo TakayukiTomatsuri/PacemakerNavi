@@ -5,7 +5,6 @@ package com.example.user1.pacemakernavi;
  */
 
 import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -17,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 //https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
 //からのコピペ
-//ルート検索レスポンスのJSONを解釈した後に、ポリライン(GooogleMaps上に道順を描くにはこれが便利?)に変換してくれる
+//ルート検索レスポンスのJSONを解釈した後に、LatLngの配列(地図上の座標。Polylineに変換しやすい。)に変換してくれる
 public class DataParser {
 
     /** Receives a JSONObject and returns a list of lists containing latitude and longitude */

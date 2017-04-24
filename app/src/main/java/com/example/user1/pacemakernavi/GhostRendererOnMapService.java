@@ -77,7 +77,7 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
             e.printStackTrace();
         }
 
-
+        //voidにしたらなんかエラーがでたような気がするのでStringを意味もなく渡す
         return "aaa";
     }
 
@@ -90,7 +90,7 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
     // 進捗状況をUIに反映するための処理(UIスレッド)
     @Override
     protected void onProgressUpdate(PolylineOptions... polyline) {
-        // ポリラインを伸ばす
+        // ポリラインを描画する
         mMap.addPolyline(polyline[0]);
     }
 

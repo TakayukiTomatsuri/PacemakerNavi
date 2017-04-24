@@ -117,7 +117,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
 
     //-----目的地までのルートを取得するための機能たち----//
-    //ルートを設定し描画する
+    //ルートを設定し描画する。ルートは親のNavigationControlActivityがルートを検索してくれ、検索結果のJSONが渡される。
     public void setRoute(Place destination, Place origin, JSONObject routeResult) {
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
@@ -142,7 +142,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
     }
 
-    //デバッグ用。PlaceではなくLatLngで目的地・出発地を渡す
+    //デバッグ用。上のメソッドの、PlaceではなくLatLngで目的地・出発地を渡す版
     public void setRoute(LatLng destination, LatLng origin, JSONObject routeResult) {
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
@@ -161,6 +161,7 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         parserTask.execute(routeResult.toString());
 
         //なぜかずれる！！！！
+        //TODO: 出発地もしくは現在地にズームインしたいが、Latitudeは合うみたいだけどLongtitudeが0のままになるみたい。
         //move map camera
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(origin));

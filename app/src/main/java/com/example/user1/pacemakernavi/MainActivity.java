@@ -18,7 +18,8 @@ import com.google.android.gms.location.places.Place;
  * Created by user1 on 2017/04/17.
  */
 
-//目的地設定などをします
+//目的地設定などをします。
+//メインとは名がついているけど、現状は起動時の設定画面をコントロールするだけのActivityです。
 public class MainActivity extends Activity implements  PlacePickerFragment.PlacePickerFragmentListener, SettingMenuFragment.SettingMenuFragmentListener {
 
     private Place destination = null;   //セットされた目的地

@@ -18,8 +18,8 @@ import com.google.android.gms.location.places.Place;
  * Created by user1 on 2017/04/18.
  */
 
-//メインメニューです
-//目的地・出発地選択ボタンと、到着時刻・所要時間の設定などを行います。
+//起動した時に表示される初めのメニューです
+//目的地・出発地選択ボタンと、到着時刻・所要時間の設定などを行う予定だけど未実装。
 public class SettingMenuFragment extends Fragment{
 
     private SettingMenuFragment.SettingMenuFragmentListener listener = null;
@@ -62,13 +62,13 @@ public class SettingMenuFragment extends Fragment{
     public void onStart() {
         super.onStart();
 
-        //目的地/出発地を設定するボタンが押された時の処理
+        //目的地/出発地を設定するボタンが押された時の処理をセット
         Button chooseDistinationButton = (Button)getActivity().findViewById(R.id.chooseDestinationButton);
         chooseDistinationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getActivity(), "hoge!", Toast.LENGTH_SHORT).show();
-                //ここにボタンが押された時の処理
+                //ここにボタンが押された時の処理。親のアクティビティで処理している
                 listener.onClickSettingMenuButton(v);
             }
         });
