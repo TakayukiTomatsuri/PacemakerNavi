@@ -64,6 +64,7 @@ public class NavigationControlActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+    final int REQUEST_LOCATION = 1;
     LatLng destination;
     LatLng origin;
     NavigationMapFragment navigationMapFragment;
@@ -91,9 +92,9 @@ public class NavigationControlActivity extends Activity implements
         origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
 
         //画面に配置されてるフラグメントを取得
-        FragmentManager fragmentManager  = getFragmentManager();
-         navigationMapFragment =  (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
-         navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
+        FragmentManager fragmentManager = getFragmentManager();
+        navigationMapFragment = (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
+        navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
 
         // LocationRequest を生成して精度、インターバルを設定
         locationRequest = LocationRequest.create();
@@ -166,6 +167,7 @@ public class NavigationControlActivity extends Activity implements
                     @Override
                     public void run() {
                         fusedLocationProviderApi.removeLocationUpdates(mGoogleApiClient, NavigationControlActivity.this);
+
                     }
                 }, 60000, TimeUnit.MILLISECONDS);
 //
@@ -221,8 +223,16 @@ public class NavigationControlActivity extends Activity implements
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.d("NavigationActivity", "ACCESS_FINE_LOCATION is permitted");
+
+        //ユーザーがパーミッションを与えてくれない場合、許可するまで延々と要求し続ける。
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "PERMITT OR DIE!", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+            return;
+        }
         //地図画面の現在地表示をオン
-        //TODO: パーミッションチェックをしろとの警告が出るが消し方不明。してるつもりなのに...
         navigationMapFragment.mMap.setMyLocationEnabled(true);
     }
 

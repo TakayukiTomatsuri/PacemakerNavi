@@ -30,7 +30,7 @@ import java.util.List;
 
 //時間経過にしたがって、ゴーストの軌跡を伸ばしていく。
 //伸ばすスピードは、ステップにかかる時間と、ステップを表すポリラインに含まれる点の数によって変えていく。(下のdoInBackground内のintervalTimeの定義を参照)
-public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOptions, String> {
+public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOptions, Void> {
     GoogleMap mMap = null;
 
     public GhostRendererOnMapService(GoogleMap map) {
@@ -45,7 +45,7 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
     }
 
     // 別スレッド処理
-    protected String doInBackground(JSONObject... json) {
+    protected Void doInBackground(JSONObject... json) {
         PolylineOptions polyline = new PolylineOptions();
         try {
             //stepsを抽出
@@ -78,7 +78,7 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
         }
 
         //voidにしたらなんかエラーがでたような気がするのでStringを意味もなく渡す
-        return "aaa";
+        return null;
     }
 
 
