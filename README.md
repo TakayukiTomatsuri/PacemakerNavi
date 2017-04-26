@@ -9,6 +9,13 @@ A navigation app with setting your pace in running (or driving).
   
 まだ未実装ですが、到着時刻の編集と、右左折までの距離や、理想的な速度のコーチなどもする予定です。  
 
+## 動作説明
+利用するだけの場合は、この欄の説明は読まなくても大丈夫。飛ばしてください。  
+![Alt appflow](/readmeImages/appflow.png)
+  
+上の図のようになってます。Activityが画面全体のコントロールをして、Fragmentが画面上のパーツのレイアウトとコントロールを持っているような感じです。  
+
+
 ## 要件
 AndroidStudioがあれば動くと思います。  
 Mac版のAndroidStudio2.3.2を使用、実機での確認はAndroid6.0のHuawei Mediapad m3だけでしかしていません。
