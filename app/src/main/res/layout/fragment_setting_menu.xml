@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><!--- SettingMenuFragment(メニュー)で使うレイアウト -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <Button
+        android:id="@+id/chooseDestinationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Distination" />
+
+    <TextView
+        android:id="@+id/destinationInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NO DESTINATION" />
+
+    <Button
+        android:id="@+id/chooseOriginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Origin" />
+
+    <TextView
+        android:id="@+id/originInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NO ORIGIN" />
+
+    <Button
+        android:id="@+id/startNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="START NAVI" />
+</LinearLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><!--- ナビゲーション画面の下半分の、インフォーメーション欄。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/instruction"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="NEXT STEP INSTRUCTION"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+</LinearLayout>
