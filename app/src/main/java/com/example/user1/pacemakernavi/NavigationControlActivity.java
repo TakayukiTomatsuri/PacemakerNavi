@@ -91,9 +91,9 @@ public class NavigationControlActivity extends Activity implements
         origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
 
         //画面に配置されてるフラグメントを取得
-        FragmentManager fragmentManager  = getFragmentManager();
-         navigationMapFragment =  (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
-         navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
+        FragmentManager fragmentManager = getFragmentManager();
+        navigationMapFragment = (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
+        navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
 
         // LocationRequest を生成して精度、インターバルを設定
         locationRequest = LocationRequest.create();
