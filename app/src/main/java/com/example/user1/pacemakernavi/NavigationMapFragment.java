@@ -135,11 +135,8 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         // Invokes the thread for parsing the JSON data
         parserTask.execute(routeResult.toString());
 
-        //なぜかずれる！！！！
-        //move map camera
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(origin.getLatLng()));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
+        //出発地にズームイン
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin.getLatLng(), 11));
     }
 
     //デバッグ用。上のメソッドの、PlaceではなくLatLngで目的地・出発地を渡す版
@@ -160,12 +157,8 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         // Invokes the thread for parsing the JSON data
         parserTask.execute(routeResult.toString());
 
-        //なぜかずれる！！！！
-        //TODO: 出発地もしくは現在地にズームインしたいが、Latitudeは合うみたいだけどLongtitudeが0のままになるみたい。
-        //move map camera
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(originLatLng.latitude+300, originLatLng.longitude)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(3));
+        //出発地にズームイン
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 11));
     }
 
     //以下は、　https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
