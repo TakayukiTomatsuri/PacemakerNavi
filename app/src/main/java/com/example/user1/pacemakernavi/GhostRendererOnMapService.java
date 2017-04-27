@@ -77,13 +77,12 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
             e.printStackTrace();
         }
 
-        //voidにしたらなんかエラーがでたような気がするのでStringを意味もなく渡す
         return null;
     }
 
 
     // doInBackgroundの事後処理(UIスレッド)
-    protected void onPostExecute(String... sss) {
+    protected void onPostExecute() {
 
     }
 
