@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,9 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     //PlacePickerは選択のたび生成/破棄されるみたいなのでここで生成しない
     //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
 
+    private int targetTimeParcent = 0;
+    private int duration = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +71,34 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
 
         // 最後にcommitしないと反映されない!
         transaction.commit();
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //TODO: onCreateだと時間的に準備が整っていないのでこっちでやってるが、onStart()はライフサイクル的にはリスタートされた後にも呼ばれる。なるべく一度しか呼ばれないところに移すべき。
+        final TextView targetTimeInformation = (TextView) findViewById(R.id.targetTimeInformation);
+        //シークバーの挙動をセット
+        ((SeekBar) this.findViewById(R.id.timebar)).setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    public void onProgressChanged(SeekBar seekBar,
+                                                  int progress, boolean fromUser) {
+                        // ツマミをドラッグしたときに呼ばれる
+                    }
+
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // ツマミに触れたときに呼ばれる
+                    }
+
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        //ツマミを離したときに呼ばれる
+                        targetTimeParcent = seekBar.getProgress();
+                        targetTimeInformation.setText("TARGET DURATION: " + duration * targetTimeParcent * 0.01 + "sec (" + targetTimeParcent + "%)");
+                    }
+                }
+        );
     }
 
     //PlacePicker上で目的地が選択された場合に呼ばれるコールバックメソッド(使い方あってる...?)
@@ -111,6 +143,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             intent.putExtra("DestLng", destination.getLatLng().longitude);
             intent.putExtra("OriginLat", origin.getLatLng().latitude);
             intent.putExtra("OriginLng", origin.getLatLng().longitude);
+            intent.putExtra("TargetTimePercent", targetTimeParcent);
             startActivity(intent);
 
             return;
@@ -193,10 +226,11 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
                 try {
                     JSONObject distanceResult = new JSONObject(result);
                     JSONObject element = distanceResult.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0);
-                    JSONObject distance = element.getJSONObject("distance");
-                    JSONObject duration = element.getJSONObject("duration");
-                    Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distance.getString("text") + " DURATION: " + duration.getString("text"));
-                    distanceInfo.setText("DISTANCE: " + distance.getString("text") + "       DURATION: " + duration.getString("text"));
+                    JSONObject distanceJson = element.getJSONObject("distance");
+                    JSONObject durationJson = element.getJSONObject("duration");
+                    Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distanceJson.getString("text") + " DURATION: " + durationJson.getString("text"));
+                    distanceInfo.setText("DISTANCE: " + distanceJson.getString("text") + "       DURATION: " + durationJson.getString("text"));
+                    duration = durationJson.getInt("value");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

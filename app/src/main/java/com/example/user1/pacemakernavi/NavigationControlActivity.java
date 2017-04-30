@@ -79,6 +79,7 @@ public class NavigationControlActivity extends Activity implements
     private LocationRequest locationRequest;
     private Location location;
     private long lastLocationTime = 0;
+    private int targetTimePercent = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,8 @@ public class NavigationControlActivity extends Activity implements
         //intentで受け取った目的地と出発地をセットする
         destination = new LatLng(intent.getDoubleExtra("DestLat", 0.0), intent.getDoubleExtra("DestLng", 0.0));
         origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
+
+        targetTimePercent = intent.getIntExtra("TargetTimePercent", 0);
 
         //画面に配置されてるフラグメントを取得
         FragmentManager fragmentManager = getFragmentManager();
@@ -378,7 +381,7 @@ public class NavigationControlActivity extends Activity implements
             Log.d("NaviMap", "START GHOST");
             try {
                 GhostRendererOnMapService ghost = new GhostRendererOnMapService(navigationMapFragment.mMap);
-                ghost.execute(new JSONObject(result));
+                ghost.execute(result, new Integer(targetTimePercent).toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
