@@ -5,13 +5,27 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.vision.text.Text;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 /**
@@ -67,6 +81,10 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             origin = chosenPlace;
             settingMenuFragment.setOriginInfo(chosenPlace);
         }
+
+        //時間と距離の表示
+        if (origin != null && destination != null)
+            getDistance(origin.getLatLng(), destination.getLatLng());
     }
 
     //SettingMenuFragment上のボタンが押された時に呼ばれるコールバックメソッド
@@ -116,6 +134,74 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    //GoogleDistanceAPIで距離と時間を計算してもらう
+    //TODO: あちこちに分散してるGoogleMapsAPIやGoogleDistanceMatrixAPIやらを使う部分を一つのクラスにまとめる(API使ってのデータ取得以外の仕事はこっちで実装したいのでlistnerとか使って、取得処理終了時にコールバックメソッドを呼ばせる?)
+    public void getDistance(LatLng origin, LatLng destination) {
+        if (origin == null || destination == null) {
+            Log.d("MainActivity", "getDistance error. origin or destination is null.");
+            return;
+        }
+
+        String urlString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" + origin.latitude + "," + origin.longitude + "&destinations=" + destination.latitude + "," + destination.longitude + "&key=AIzaSyDU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58";
+        final TextView distanceInfo = (TextView) this.findViewById(R.id.distanceInformation);
+
+        new AsyncTask<String, Void, String>() {
+            @Override
+            protected String doInBackground(String... strUrl) {
+                String data = "";
+                InputStream iStream = null;
+                HttpURLConnection urlConnection = null;
+                URL url = null;
+                try {
+                    url = new URL(strUrl[0]);
+
+                    // Creating an http connection to communicate with url
+                    urlConnection = (HttpURLConnection) url.openConnection();
+
+                    // Connecting to url
+                    urlConnection.connect();
+
+                    // Reading data from url
+                    iStream = urlConnection.getInputStream();
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+                    StringBuffer sb = new StringBuffer();
+
+                    String line = "";
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    data = sb.toString();
+                    Log.d("downloadUrl", data.toString());
+                    br.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("Background Task data", data.toString());
+
+                return data;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                try {
+                    JSONObject distanceResult = new JSONObject(result);
+                    JSONObject element = distanceResult.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0);
+                    JSONObject distance = element.getJSONObject("distance");
+                    JSONObject duration = element.getJSONObject("duration");
+                    Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distance.getString("text") + " DURATION: " + duration.getString("text"));
+                    distanceInfo.setText("DISTANCE: " + distance.getString("text") + "       DURATION: " + duration.getString("text"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute(urlString);
     }
 
 

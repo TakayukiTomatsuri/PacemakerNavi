@@ -33,4 +33,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="START NAVI" />
+
+    <TextView
+        android:id="@+id/distanceInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DURATION: n/a       DISTANCE: n/a" />
 </LinearLayout>

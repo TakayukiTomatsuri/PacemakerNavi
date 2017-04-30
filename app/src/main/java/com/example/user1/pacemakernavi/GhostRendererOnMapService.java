@@ -76,8 +76,6 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //voidにしたらなんかエラーがでたような気がするのでStringを意味もなく渡す
         return null;
     }
 

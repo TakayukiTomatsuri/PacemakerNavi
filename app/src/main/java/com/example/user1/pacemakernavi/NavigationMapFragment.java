@@ -158,7 +158,10 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
         parserTask.execute(routeResult.toString());
 
         //出発地にズームイン
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 11));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 11));
+
     }
 
     //以下は、　https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/

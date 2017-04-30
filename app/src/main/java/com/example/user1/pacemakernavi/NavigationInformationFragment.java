@@ -51,7 +51,7 @@ public class NavigationInformationFragment extends Fragment implements
 
     //行程のエンドポイントに到達したかどうかを判定するジオフェンスを追加する
     public void addGeofences(JSONObject route) {
-        final int radius = 50;
+        final int radius = 20;
 
         try {
             jsonSteps = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
@@ -62,6 +62,7 @@ public class NavigationInformationFragment extends Fragment implements
             }
             //setpsのエンドポイントの位置を全て登録していく
             for (int i = 0; i < jsonSteps.length(); i++) {
+                Log.d("NaviInfoFragment", jsonSteps.getJSONObject(stepsIndex).getString("html_instructions"));
                 JSONObject endLocation = jsonSteps.getJSONObject(i).getJSONObject("end_location");
                 //Geofenceの作成
                 mGeofenceList.add(new Geofence.Builder()

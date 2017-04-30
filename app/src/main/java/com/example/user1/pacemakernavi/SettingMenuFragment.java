@@ -3,6 +3,7 @@ package com.example.user1.pacemakernavi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static android.R.attr.data;
 
 /**
  * Created by user1 on 2017/04/18.
@@ -103,6 +117,4 @@ public class SettingMenuFragment extends Fragment{
         TextView originInfoText = (TextView)getActivity().findViewById(R.id.originInformation);
         originInfoText.setText(place.getName());
     }
-
-
 }
