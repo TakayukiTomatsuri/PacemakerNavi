@@ -27,7 +27,7 @@ public class GoogleMapsDirectionApiClient {
         void onResultOfGoogleMapsDirectionApi(String result);
     }
 
-    public void fetchData(LatLng origin, LatLng destination, GoogleMapsDirectionApiClient.GoogleMapsDirectionApiReceiver caller) {
+    public static void fetchData(LatLng origin, LatLng destination, GoogleMapsDirectionApiClient.GoogleMapsDirectionApiReceiver caller) {
         if (origin == null || destination == null || caller == null) {
             Log.e("DistanceMatrixClient", "ORIGN or DEST or CALLER is null!");
             return;
@@ -80,26 +80,17 @@ public class GoogleMapsDirectionApiClient {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
-                try {
-                    //デバッグのため情報表示
-                    JSONObject distanceResult = new JSONObject(result);
-                    JSONObject element = distanceResult.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0);
-                    JSONObject distanceJson = element.getJSONObject("distance");
-                    JSONObject durationJson = element.getJSONObject("duration");
-                    Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distanceJson.getString("text") + " DURATION: " + durationJson.getString("text"));
+                Log.i("DirectionAPIClient", result);
 
-                    //呼び出し元のコールバックメソッドを呼び出して、結果を渡す
-                    methodCaller.onResultOfGoogleMapsDirectionApi(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                //呼び出し元のコールバックメソッドを呼び出して、結果を渡す
+                methodCaller.onResultOfGoogleMapsDirectionApi(result);
             }
         }.execute(generateUrl(origin, destination));
 
     }
 
     //リクエストのためのURL生成
-    private String generateUrl(LatLng origin, LatLng dest) {
+    private static String generateUrl(LatLng origin, LatLng dest) {
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         // Destination of route

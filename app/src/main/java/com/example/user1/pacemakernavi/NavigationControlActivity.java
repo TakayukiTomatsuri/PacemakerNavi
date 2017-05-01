@@ -59,23 +59,38 @@ import java.util.concurrent.TimeUnit;
 
 //ナビゲーション画面のコントローラとなるアクティビティです
 //位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentと　NavigationInformationFragmentに渡します。
-public class NavigationControlActivity extends Activity {
+public class NavigationControlActivity extends Activity implements GoogleMapsDirectionApiClient.GoogleMapsDirectionApiReceiver {
     final int REQUEST_LOCATION = 1;
     LatLng destination;
     LatLng origin;
     NavigationMapFragment navigationMapFragment;
     NavigationInformationFragment navigationInformationFragment;
-
-    // LocationClient の代わりにGoogleApiClientを使います
-    private GoogleApiClient mGoogleApiClient;
-    private boolean mResolvingError = false;
-
-    private FusedLocationProviderApi fusedLocationProviderApi;
-
-    private LocationRequest locationRequest;
-    private Location location;
-    private long lastLocationTime = 0;
     private int targetTimePercent = 0;
+
+    //GoogleDirectionAPIのレスポンスが返ってきたら呼ばれるコールバックメソッド
+    @Override
+    public void onResultOfGoogleMapsDirectionApi(String result) {
+        try {
+            //マップにルート情報を設定(NavigationMapFragmentにてMapの準備ができてない=onMapReadyがまだ呼ばれてない時に呼ぶとエラー)
+            navigationMapFragment.setRoute(destination, origin, new JSONObject(result));
+            //インフォーメーション部(ナビゲーション画面の下半分)に、行程(xx交差点で曲がる)を設定する
+            navigationInformationFragment.addGeofences(new JSONObject(result));
+            //右に曲がるとかそういう指示を表示させるための準備
+            navigationInformationFragment.changeSteps();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //ゴーストを描画してくれるスレッドを起動
+        Log.d("NaviMapActivity", "START GHOST");
+        try {
+            GhostRendererOnMapService ghost = new GhostRendererOnMapService(navigationMapFragment.mMap);
+            //開始させるときに、ゴーストのスピードも指定する(通常の何パーセントの時間で進むか)
+            ghost.execute(result, new Integer(targetTimePercent).toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,121 +181,7 @@ public class NavigationControlActivity extends Activity {
         LatLng originLatLng = origin;
         LatLng destLatLng = destination;
 
-        // Getting URL to the Google Directions API
-        String url = getUrl(originLatLng, destLatLng);
-        Log.d("onMapClick", url.toString());
-        NavigationControlActivity.FetchUrl FetchUrl = new NavigationControlActivity.FetchUrl();
-
-        // Start downloading json data from Google Directions API
-        FetchUrl.execute(url);
-    }
-
-    //https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
-    //からのコピペ
-
-    //generate URL
-    private String getUrl(LatLng origin, LatLng dest) {
-        // Origin of route
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-        // Destination of route
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-        // Sensor enabled
-        String sensor = "sensor=false";
-        // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor;
-        // Output format
-        String output = "json";
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-        return url;
-    }
-
-    /**
-     * A method to download json data from url
-     */
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(strUrl);
-
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            // Connecting to url
-            urlConnection.connect();
-
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb = new StringBuffer();
-
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            data = sb.toString();
-            Log.d("downloadUrl", data.toString());
-            br.close();
-
-        } catch (Exception e) {
-            Log.d("Exception", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
-    }
-
-
-    // Fetches data from url passed
-    private class FetchUrl extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... url) {
-
-            // For storing data from web service
-            String data = "";
-
-            try {
-                // Fetching the data from web service
-                data = downloadUrl(url[0]);
-                Log.d("Background Task data", data.toString());
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            try {
-                //マップにルート情報を設定(NavigationMapFragmentにてMapの準備ができてない=oMapReadyがまだ呼ばれてない時に呼ぶとエラー)
-                navigationMapFragment.setRoute(destination, origin, new JSONObject(result));
-                //インフォーメーション部(ナビゲーション画面の下半分)に、行程(xx交差点で曲がる)を設定する
-                navigationInformationFragment.addGeofences(new JSONObject(result));
-                //右に曲がるとかそういう指示を表示させるための準備
-                navigationInformationFragment.changeSteps();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            //ゴーストを描画してくれるスレッドを起動
-            Log.d("NaviMap", "START GHOST");
-            try {
-                GhostRendererOnMapService ghost = new GhostRendererOnMapService(navigationMapFragment.mMap);
-                ghost.execute(result, new Integer(targetTimePercent).toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        GoogleMapsDirectionApiClient.fetchData(origin, destination, this);
     }
 
 }
