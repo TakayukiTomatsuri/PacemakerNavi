@@ -27,9 +27,9 @@ import org.json.JSONObject;
 //目的地・出発地選択ボタンと、到着時刻・所要時間の設定などを行う予定だけど未実装。
 public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceMatrixApiClient.GoogleMapsDistanceMatrixApiListner {
 
-    private SettingMenuFragment.SettingMenuFragmentListener listener = null;
+    private SettingMenuFragment.SettingMenuFragmentListener listener = null;    //ボタンを押したときにコールバックメソッドを呼ぶ(呼ばれるリスナー)
     public int durationOfRoute = 0; //目的地までの時間
-    public int targetTimeParcent = 0;
+    public int targetTimeParcent = 0;   //通常の何パーセントの時間で目的地に着くのを目標とするか
 
     //GoogleDistanceMatrixAPIをリクエストした後に、結果を受け取るコールバックメソッド
     @Override
@@ -43,7 +43,8 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
             JSONObject distanceJson = element.getJSONObject("distance");
             JSONObject durationJson = element.getJSONObject("duration");
             Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distanceJson.getString("text") + " DURATION: " + durationJson.getString("text"));
-            //画面に表示
+
+            //画面に距離と時間を表示
             distanceInfo.setText("DISTANCE: " + distanceJson.getString("text") + "       DURATION: " + durationJson.getString("text"));
             durationOfRoute = durationJson.getInt("value");
         } catch (JSONException e) {
@@ -51,7 +52,7 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
         }
     }
 
-    //このPlacePickerのイベント?のリスナー。このアプリではMainActivityを想定している。
+    //このPlacePickerのイベント?のリスナー。このアプリでは通常、リスナーはMainActivityを想定している。
     public interface SettingMenuFragmentListener {
         //押されたボタンを渡す。buttonView.getIdでどのボタンが押されたのか識別する
         void onClickSettingMenuButton(View buttonView);
@@ -125,7 +126,8 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
         //下のシークバーの挙動のセットで、「インナークラスから参照されるときはfinalにして」って言われるので
         final TextView targetTimeInformation = (TextView) getActivity().findViewById(R.id.targetTimeInformation);
         //シークバーの挙動をセット
-        ((SeekBar) getActivity().findViewById(R.id.timebar)).setOnSeekBarChangeListener(
+        SeekBar timeSetBar = ((SeekBar) getActivity().findViewById(R.id.timebar));
+        timeSetBar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
                     public void onProgressChanged(SeekBar seekBar,
                                                   int progress, boolean fromUser) {
@@ -143,6 +145,7 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
                     }
                 }
         );
+        targetTimeParcent = timeSetBar.getProgress();
     }
 
     //目的地・出発地の情報をセット
@@ -156,6 +159,7 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
         originInfoText.setText(place.getName());
     }
 
+    //経路情報の取得(終わった後、コールバックメソッドとしてonResultOfGoogleMapsDistanceMatrixApiが呼ばれる)
     public void setDirectionInformation(LatLng origin, LatLng destination) {
         GoogleMapsDistanceMatrixApiClient.fetchData(origin, destination, this);
     }

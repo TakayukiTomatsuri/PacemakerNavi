@@ -152,7 +152,7 @@ public class PlacePickerFragment extends Fragment {
                 }
 
                 // Print data to debug log
-                Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
+                Log.i(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
 
             } else {
             }

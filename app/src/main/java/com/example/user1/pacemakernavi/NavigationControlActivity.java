@@ -60,12 +60,12 @@ import java.util.concurrent.TimeUnit;
 //ナビゲーション画面のコントローラとなるアクティビティです
 //位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentと　NavigationInformationFragmentに渡します。
 public class NavigationControlActivity extends Activity implements GoogleMapsDirectionApiClient.GoogleMapsDirectionApiReceiver {
-    final int REQUEST_LOCATION = 1;
-    LatLng destination;
-    LatLng origin;
-    NavigationMapFragment navigationMapFragment;
-    NavigationInformationFragment navigationInformationFragment;
-    private int targetTimePercent = 0;
+    final int REQUEST_LOCATION = 1; //パーミッションかなにかリクエストするときにどこのリクエストだったかの識別のためのrequestCode。コールバックメソッド内で、どっから帰ってきたのかの識別に使うっぽい
+    LatLng destination; //目的地、MainActivityから渡される
+    LatLng origin;  //出発地、MainActivityから渡される
+    NavigationMapFragment navigationMapFragment;    //配下のFragment、地図表示担当
+    NavigationInformationFragment navigationInformationFragment;    //配下のFragment、画面下半分で情報表示担当
+    private int targetTimePercent = 0;  //通常の何パーセントの時間で目標に到達するか(設定画面で設定したもの)
 
     //GoogleDirectionAPIのレスポンスが返ってきたら呼ばれるコールバックメソッド
     @Override
@@ -104,13 +104,12 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
         origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
 
         targetTimePercent = intent.getIntExtra("TargetTimePercent", 0);
+        Log.d("NavigationActivity", "TargetTimePercent: " + targetTimePercent);
 
         //画面に配置されてるフラグメントを取得
         FragmentManager fragmentManager = getFragmentManager();
         navigationMapFragment = (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
         navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
-
-        Log.d("NaviControlActivity", "mGoogleApiClient");
 
         //ルートのセットを開始
         this.setRoute(destination, origin);
@@ -155,7 +154,7 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        Log.d("onNewIntent", String.valueOf(intent));
+        Log.i("onNewIntent", String.valueOf(intent));
         //ジオフェンスのイベントのタイプを判別する
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         int transitionType = event.getGeofenceTransition();
@@ -165,22 +164,18 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
         }
     }
 
-
-    //-----------------
-    //-----------------
-    //-----目的地までのルートを取得するための機能たち----//
-
     //ルートを設定する
     private void setRoute(LatLng destination, LatLng origin) {
         //目的地/出発地が設定されてない場合
         if (destination == null || origin == null) {
-            Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
+            Log.w("NaviMapFragment", "DEST or ORIGIN is not set.");
             //return;
         }
 
         LatLng originLatLng = origin;
         LatLng destLatLng = destination;
 
+        //DirectionAPIで経路情報取得(取得した後、コールバックメソッドとしてonResultOfGoogleMapsDirectionApiが呼ばれる)
         GoogleMapsDirectionApiClient.fetchData(origin, destination, this);
     }
 

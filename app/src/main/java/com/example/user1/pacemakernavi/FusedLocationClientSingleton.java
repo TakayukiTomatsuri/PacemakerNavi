@@ -22,27 +22,28 @@ import java.util.List;
  * Created by user1 on 2017/05/01.
  */
 
+//Applicationの拡張クラスなことに注意
+//このアプリ全体での位置情報更新を行わせるためにシングルトンパターン。(=インスタンスが一つしか存在しない)
 public class FusedLocationClientSingleton extends Application implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    //シングルトン！
-    private static FusedLocationClientSingleton sInstance = null;
-    private LocationRequest locationRequest;
+    private static FusedLocationClientSingleton sInstance = null;   //唯一のインスタンスを保持する
+    private LocationRequest locationRequest;    //ロケーション更新要請の情報みたいなもの
     private FusedLocationProviderApi fusedLocationProviderApi;
 
     // LocationClient の代わりにGoogleApiClientを使います
     private GoogleApiClient mGoogleApiClient;
 
-    private boolean mResolvingError = false;
+    private boolean mResolvingError = false;    //GoogleApiClientのコネクション確立失敗時のフラグ
 
-    private List<LocationListener> listeners = new ArrayList<LocationListener>(10);
+    private List<LocationListener> listeners = new ArrayList<LocationListener>(10); //位置情報更新を受けたいリスナーたち
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("FusedLocationSingleton", "onCerate");
+
         sInstance = this;
 
         // LocationRequest を生成して精度、インターバルを設定
@@ -62,8 +63,8 @@ public class FusedLocationClientSingleton extends Application implements
         startFusedLocation();
     }
 
+    //シングルトンパターンでは、インスタンスはこのクラスメソッドを介して行う
     public static FusedLocationClientSingleton getInstance() {
-        Log.d("FusedLocationClient", "getInstance");
         if (sInstance == null) {
             Log.e("FusedLocationClient", "Singleton instance is not generated.");
         }
@@ -81,6 +82,8 @@ public class FusedLocationClientSingleton extends Application implements
         }
     }
 
+    //位置情報取得を止めたいときはこれを呼ぶ
+    //注意点として、Applicationの拡張クラスなので、終了するまでバックグラウンドでも位置情報を更新し続けると思う(ActivityやFragmentならリソース不足などで中断もありうる)
     private void stopFusedLocation() {
         // Disconnecting the client invalidates it.
         mGoogleApiClient.disconnect();
@@ -119,12 +122,13 @@ public class FusedLocationClientSingleton extends Application implements
     @Override
     public void onLocationChanged(Location location) {
         Log.d("FusedLocationClient", "onLocationChanged!");
-        //登録してある全部のリスナーについて、コールバックメソッドを呼んであげる
+        //登録してある全部のリスナーについて、コールバックメソッドを呼んで位置情報を渡してあげる
         for (LocationListener listener : listeners) {
             listener.onLocationChanged(location);
         }
     }
 
+    //リスナーの追加はこれ
     public void addListner(LocationListener listener) {
         listeners.add(listener);
     }

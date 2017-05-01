@@ -46,6 +46,7 @@ public class NavigationInformationFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         stepsIndex = 0;
 
+        //位置情報更新を通知してもらえるようにする
         FusedLocationClientSingleton.getInstance().addListner(this);
 
         //GoogleApiClientの作成
@@ -64,7 +65,7 @@ public class NavigationInformationFragment extends Fragment implements
             jsonSteps = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
             //ジオフェンスは一度に100個以上は登録できないので、一応お知らせする
             if (jsonSteps.length() >= 100) {
-                Log.d("NaviInfoFragment", "Too many steps in route!");
+                Log.e("NaviInfoFragment", "Too many steps in route!");
                 return;
             }
             //setpsのエンドポイントの位置を全て登録していく
@@ -90,7 +91,7 @@ public class NavigationInformationFragment extends Fragment implements
     //呼ぶたびに行程を一個ずつ進める。何番目の行程、とか指定した方がいいかもしれない。
     public void changeSteps() {
         if (stepsIndex >= jsonSteps.length()) {
-            Log.d("NaviInfoFragment", "Steps is over. You have reached the destination.");
+            Log.e("NaviInfoFragment", "Steps is over. You have reached the destination.");
             return;
         }
 
@@ -126,9 +127,8 @@ public class NavigationInformationFragment extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
-
+        //xx交差点を右、とかいう指示を表示するテキストフィールド
         instructionField = (TextView) getActivity().findViewById(R.id.instruction);
-
     }
 
 
@@ -156,13 +156,13 @@ public class NavigationInformationFragment extends Fragment implements
 
     }
 
-    //画面に表示する速度を更新
+    //画面に表示する、進む速度を更新
     public void setUserSpeed(float speed) {
         TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
         userSpeedInfo.setText("YOUR: " + speed + "m/s    GHOST: " + ghostSpeed + "m/s");
     }
 
-
+    //移動したら進んでる速度を更新
     @Override
     public void onLocationChanged(Location location) {
         setUserSpeed(location.getSpeed());

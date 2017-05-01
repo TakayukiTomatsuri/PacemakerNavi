@@ -19,7 +19,7 @@ import java.net.URL;
  * Created by user1 on 2017/05/01.
  */
 
-//GoogleMapsDistanceMatrixApiで、距離と時間をフェッチしてくるやつ
+//GoogleMapsDistanceMatrixApiで、目的地ー出発地間の距離と時間をリクエストする
 //インスタンスはつくらないで、GoogleMapsDistanceMatrixApiClient.fetchData(origin, destination, this);みたいにして呼び出す。
 //呼び出した側(this)にGoogleMapsDistanceMatrixApiListnerインターフェースを実装し、コールバックメソッドを呼ばれる準備をする必要がある。
 public class GoogleMapsDistanceMatrixApiClient {
@@ -32,7 +32,7 @@ public class GoogleMapsDistanceMatrixApiClient {
 
     public static void fetchData(LatLng origin, LatLng destination, GoogleMapsDistanceMatrixApiClient.GoogleMapsDistanceMatrixApiListner caller) {
         if (origin == null || destination == null || caller == null) {
-            Log.e("DistanceMatrixClient", "ORIGN or DEST or CALLER is null!");
+            Log.w("GMDistanceMatrixClient", "ORIGN or DEST or CALLER is null!");
             return;
         }
 
@@ -70,13 +70,12 @@ public class GoogleMapsDistanceMatrixApiClient {
                     }
 
                     data = sb.toString();
-                    Log.d("GMDistanceMatrixClient", data.toString());
+                    Log.i("GMDistanceMatrixClient", data.toString());
                     br.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                Log.d("GMDistanceMatrixClient", data.toString());
                 return data;
             }
 
