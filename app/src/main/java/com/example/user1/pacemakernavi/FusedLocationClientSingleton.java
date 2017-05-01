@@ -27,7 +27,8 @@ public class FusedLocationClientSingleton extends Application implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private static FusedLocationClientSingleton sInstance;
+    //シングルトン！
+    private static FusedLocationClientSingleton sInstance = null;
     private LocationRequest locationRequest;
     private FusedLocationProviderApi fusedLocationProviderApi;
 
@@ -36,11 +37,12 @@ public class FusedLocationClientSingleton extends Application implements
 
     private boolean mResolvingError = false;
 
-    List<LocationListener> listeners = new ArrayList<LocationListener>(10);
+    private List<LocationListener> listeners = new ArrayList<LocationListener>(10);
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("FusedLocationSingleton", "onCerate");
         sInstance = this;
 
         // LocationRequest を生成して精度、インターバルを設定
@@ -61,11 +63,15 @@ public class FusedLocationClientSingleton extends Application implements
     }
 
     public static FusedLocationClientSingleton getInstance() {
+        Log.d("FusedLocationClient", "getInstance");
+        if (sInstance == null) {
+            Log.e("FusedLocationClient", "Singleton instance is not generated.");
+        }
         return sInstance;
     }
 
     private void startFusedLocation() {
-        Log.d("NaviControlActivity", "onStart");
+        Log.d("FusedLocationSingleton", "onStart");
 
         // Connect the client.
         if (!mResolvingError) {
@@ -112,6 +118,11 @@ public class FusedLocationClientSingleton extends Application implements
     //位置が変わったら呼ばれるメソッド
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("FusedLocationClient", "onLocationChanged!");
+        //登録してある全部のリスナーについて、コールバックメソッドを呼んであげる
+        for (LocationListener listener : listeners) {
+            listener.onLocationChanged(location);
+        }
     }
 
     public void addListner(LocationListener listener) {

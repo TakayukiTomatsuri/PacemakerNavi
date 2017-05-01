@@ -60,10 +60,7 @@ import java.util.concurrent.TimeUnit;
 //ナビゲーション画面のコントローラとなるアクティビティです
 //位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentと　NavigationInformationFragmentに渡します。
 //FusedLocationなんとかが使われてるけど、現在使っていません。(ルートの案内にGeoFenceを使うように変更したため)
-public class NavigationControlActivity extends Activity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class NavigationControlActivity extends Activity {
     final int REQUEST_LOCATION = 1;
     LatLng destination;
     LatLng origin;
@@ -98,45 +95,13 @@ public class NavigationControlActivity extends Activity implements
         FragmentManager fragmentManager = getFragmentManager();
         navigationMapFragment = (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
         navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
-
-        // LocationRequest を生成して精度、インターバルを設定
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(16);
-
-        fusedLocationProviderApi = LocationServices.FusedLocationApi;
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
+        
         Log.d("NaviControlActivity", "mGoogleApiClient");
-
-        //FusedLocation開始
-        startFusedLocation();
 
         //ルートのセットを開始
         this.setRoute(destination, origin);
     }
 
-    private void startFusedLocation() {
-        Log.d("NaviControlActivity", "onStart");
-
-        // Connect the client.
-        if (!mResolvingError) {
-            // Connect the client.
-            mGoogleApiClient.connect();
-        } else {
-        }
-    }
-
-    private void stopFusedLocation() {
-        // Disconnecting the client invalidates it.
-        mGoogleApiClient.disconnect();
-    }
 
     @Override
     protected void onStart() {
@@ -147,82 +112,6 @@ public class NavigationControlActivity extends Activity implements
     @Override
     protected void onStop() {
         super.onStop();
-        stopFusedLocation();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        //TODO:パーミッションチェックする
-        fusedLocationProviderApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
-
-//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        Location currentLocation = fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
-//
-//        if (currentLocation != null && currentLocation.getTime() > 20000) {
-//            location = currentLocation;
-//
-//        } else {
-//            // バックグラウンドから戻ってしまうと例外が発生する場合がある
-//            try {
-//                //
-//                fusedLocationProviderApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
-//                // Schedule a Thread to unregister location listeners
-//                Executors.newScheduledThreadPool(1).schedule(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        fusedLocationProviderApi.removeLocationUpdates(mGoogleApiClient, NavigationControlActivity.this);
-//
-//                    }
-//                }, 60000, TimeUnit.MILLISECONDS);
-////
-////                textLog += "onConnected(), requestLocationUpdates \n";
-////                textView.setText(textLog);
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                Toast toast = Toast.makeText(this, "例外が発生、位置情報のPermissionを許可していますか？", Toast.LENGTH_SHORT);
-//                toast.show();
-//
-//                //MainActivityに戻す
-//                finish();
-//            }
-//        }
-    }
-
-    //位置が変わったら呼ばれるメソッド
-    @Override
-    public void onLocationChanged(Location location) {
-        lastLocationTime = location.getTime() - lastLocationTime;
-        Log.d("NaviContAct", "Location changed!");
-        //画面に表示する速度を更新
-        NavigationInformationFragment navigationInformationFragment = (NavigationInformationFragment) getFragmentManager().findFragmentById(R.id.navigationInformationFragment);
-        navigationInformationFragment.setUserSpeed(location.getSpeed());
-    }
-
-
-    @Override
-    public void onConnectionSuspended(int i) {
-//        textLog += "onConnectionSuspended() \n";
-//        textView.setText(textLog);
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-//        textLog += "onConnectionFailed()n";
-//        textView.setText(textLog);
-
-        if (mResolvingError) {
-            // Already attempting to resolve an error.
-            Log.d("", "Already attempting to resolve an error");
-
-            return;
-        } else if (connectionResult.hasResolution()) {
-
-        } else {
-            mResolvingError = true;
-        }
     }
 
     //パーミッションをリクエストしたとき、終わった後に呼ばれるメソッド。ここで結果を確認する。

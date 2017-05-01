@@ -3,6 +3,7 @@ package com.example.user1.pacemakernavi;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.vision.text.Text;
 
@@ -29,7 +31,8 @@ import java.util.ArrayList;
 //ナビゲーション画面画面の下半分。行程や速度などを表示したい...
 public class NavigationInformationFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     TextView instructionField; //行程の指示(xx交差点で右)の表示部
     JSONArray jsonSteps; //行程(ルート検索で帰って来るJSONでいうsteps)
     int stepsIndex = 0; //行程のインデックス
@@ -42,6 +45,8 @@ public class NavigationInformationFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         stepsIndex = 0;
+
+        FusedLocationClientSingleton.getInstance().addListner(this);
 
         //GoogleApiClientの作成
         locationClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
@@ -158,4 +163,8 @@ public class NavigationInformationFragment extends Fragment implements
     }
 
 
+    @Override
+    public void onLocationChanged(Location location) {
+        setUserSpeed(location.getSpeed());
+    }
 }
