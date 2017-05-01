@@ -158,8 +158,19 @@ public class NavigationInformationFragment extends Fragment implements
 
     //画面に表示する、進む速度を更新
     public void setUserSpeed(float speed) {
+        //速度評価の許容範囲
+        //TODO: 移動手段や速度によって許容範囲を変える。(歩きなら0.5程度だが自転車など速い移動手段を使うならもっと広げるべき)
+        float tolerance = 0.5f;
+
         TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
-        userSpeedInfo.setText("YOUR: " + speed + "m/s    GHOST: " + ghostSpeed + "m/s");
+        String text = "YOUR: " + speed + "m/s    GHOST: " + ghostSpeed + "m/s\n";
+
+        //速度によって、ペース通りかどうか評価を変える。
+        if (speed > ghostSpeed + tolerance) text += "TOO FAST! SLOW DOWN";
+        else if (speed >= ghostSpeed - tolerance) text += "GOOD PACE";
+        else text += "HURRY UP! YOU ARE LATE";
+
+        userSpeedInfo.setText(text);
     }
 
     //移動したら進んでる速度を更新

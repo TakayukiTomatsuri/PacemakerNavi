@@ -28,8 +28,9 @@ import org.json.JSONObject;
 public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceMatrixApiClient.GoogleMapsDistanceMatrixApiListner {
 
     private SettingMenuFragment.SettingMenuFragmentListener listener = null;    //ボタンを押したときにコールバックメソッドを呼ぶ(呼ばれるリスナー)
-    public int durationOfRoute = 0; //目的地までの時間
-    public int targetTimeParcent = 0;   //通常の何パーセントの時間で目的地に着くのを目標とするか
+    public int durationOfRoute = 0; //目的地までの時間(秒数)
+    public int distance = 0;    //目的地までの距離(メートル)
+    public int targetTimeParcent = 0;   //通常の何パーセントの時間で目的地に着くのを目標とするか(パーセント)
 
     //GoogleDistanceMatrixAPIをリクエストした後に、結果を受け取るコールバックメソッド
     @Override
@@ -47,6 +48,7 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
             //画面に距離と時間を表示
             distanceInfo.setText("DISTANCE: " + distanceJson.getString("text") + "       DURATION: " + durationJson.getString("text"));
             durationOfRoute = durationJson.getInt("value");
+            distance = distanceJson.getInt("value");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -141,7 +143,7 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
                     public void onStopTrackingTouch(SeekBar seekBar) {
                         //ツマミを離したときに呼ばれる
                         targetTimeParcent = seekBar.getProgress();
-                        targetTimeInformation.setText("TARGET DURATION: " + durationOfRoute * targetTimeParcent * 0.01 + "sec (" + targetTimeParcent + "%)");
+                        targetTimeInformation.setText("TARGET DURATION: " + durationOfRoute * targetTimeParcent * 0.01 + "sec (" + targetTimeParcent + "%)" + "   SPEED: " + (distance / durationOfRoute * targetTimeParcent * 0.01) + "m/s");
                     }
                 }
         );
