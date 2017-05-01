@@ -7,7 +7,21 @@
     <TextView
         android:id="@+id/instruction"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+
         android:text="NEXT STEP INSTRUCTION"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_weight="0.55"
+        android:layout_height="0dp"
+
+        />
+
+    <TextView
+        android:id="@+id/speed"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.61"
+
+
+        android:text="YOUR: n/a   GHOST: n/a"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 </LinearLayout>

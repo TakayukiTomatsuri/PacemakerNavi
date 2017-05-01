@@ -192,6 +192,10 @@ public class NavigationControlActivity extends Activity implements
     @Override
     public void onLocationChanged(Location location) {
         lastLocationTime = location.getTime() - lastLocationTime;
+        Log.d("NaviContAct", "Location changed!");
+        //画面に表示する速度を更新
+        NavigationInformationFragment navigationInformationFragment = (NavigationInformationFragment) getFragmentManager().findFragmentById(R.id.navigationInformationFragment);
+        navigationInformationFragment.setUserSpeed(location.getSpeed());
     }
 
 

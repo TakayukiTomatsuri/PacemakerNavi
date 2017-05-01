@@ -15,6 +15,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.vision.text.Text;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ public class NavigationInformationFragment extends Fragment implements
     int stepsIndex = 0; //行程のインデックス
 
     private GoogleApiClient locationClient = null;
+    private float ghostSpeed = 0;   //速度の表示に使うだけの値
     ArrayList<Geofence> mGeofenceList = new ArrayList<>(); //行程のエンドポイントに到達したかどうかを判断するためのジオフェンスたち
 
     @Override
@@ -88,8 +90,14 @@ public class NavigationInformationFragment extends Fragment implements
         }
 
         try {
-            //行程の指示の表示を
+            //行程の指示の表示を更新
             instructionField.setText(jsonSteps.getJSONObject(stepsIndex).getString("html_instructions"));
+            //ゴーストの速度(ただの数字の表示用)を更新
+            JSONObject jsonDuration = jsonSteps.getJSONObject(stepsIndex).getJSONObject("duration");
+            JSONObject jsonDistance = jsonSteps.getJSONObject(stepsIndex).getJSONObject("distance");
+            //単位はm/s。
+            ghostSpeed = (float) jsonDistance.getInt("value") / jsonDuration.getInt("value");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,6 +149,12 @@ public class NavigationInformationFragment extends Fragment implements
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    //画面に表示する速度を更新
+    public void setUserSpeed(float speed) {
+        TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
+        userSpeedInfo.setText("YOUR: " + speed + "m/s    GHOST: " + ghostSpeed + "m/s");
     }
 
 

@@ -63,7 +63,7 @@ public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions
                 List<LatLng> polylinePoints = DataParser.decodePoly(encodedPolyline);
 
                 //更新までの間隔。(そのステップにかかる時間)/(そのステップに含まれるポリラインの点の数)をステップごとに変える。
-                int intervalTime = (int) ((time * 1000 / polylinePoints.size() * targetTimePercent) * 0.01);
+                int intervalTime = (int) ((time / polylinePoints.size() * 1000 * targetTimePercent) * 0.01);
                 Log.d("GHOST", "interval: "+intervalTime);
 
                 //このステップに含まれるポリライン上の全ての点に対して
