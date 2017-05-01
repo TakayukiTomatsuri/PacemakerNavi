@@ -152,40 +152,43 @@ public class NavigationControlActivity extends Activity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        Location currentLocation = fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
+        //TODO:パーミッションチェックする
+        fusedLocationProviderApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
 
-        if (currentLocation != null && currentLocation.getTime() > 20000) {
-            location = currentLocation;
-
-        } else {
-            // バックグラウンドから戻ってしまうと例外が発生する場合がある
-            try {
-                //
-                fusedLocationProviderApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
-                // Schedule a Thread to unregister location listeners
-                Executors.newScheduledThreadPool(1).schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        fusedLocationProviderApi.removeLocationUpdates(mGoogleApiClient, NavigationControlActivity.this);
-
-                    }
-                }, 60000, TimeUnit.MILLISECONDS);
+//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        Location currentLocation = fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
 //
-//                textLog += "onConnected(), requestLocationUpdates \n";
-//                textView.setText(textLog);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast toast = Toast.makeText(this, "例外が発生、位置情報のPermissionを許可していますか？", Toast.LENGTH_SHORT);
-                toast.show();
-
-                //MainActivityに戻す
-                finish();
-            }
-        }
+//        if (currentLocation != null && currentLocation.getTime() > 20000) {
+//            location = currentLocation;
+//
+//        } else {
+//            // バックグラウンドから戻ってしまうと例外が発生する場合がある
+//            try {
+//                //
+//                fusedLocationProviderApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
+//                // Schedule a Thread to unregister location listeners
+//                Executors.newScheduledThreadPool(1).schedule(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        fusedLocationProviderApi.removeLocationUpdates(mGoogleApiClient, NavigationControlActivity.this);
+//
+//                    }
+//                }, 60000, TimeUnit.MILLISECONDS);
+////
+////                textLog += "onConnected(), requestLocationUpdates \n";
+////                textView.setText(textLog);
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                Toast toast = Toast.makeText(this, "例外が発生、位置情報のPermissionを許可していますか？", Toast.LENGTH_SHORT);
+//                toast.show();
+//
+//                //MainActivityに戻す
+//                finish();
+//            }
+//        }
     }
 
     //位置が変わったら呼ばれるメソッド
