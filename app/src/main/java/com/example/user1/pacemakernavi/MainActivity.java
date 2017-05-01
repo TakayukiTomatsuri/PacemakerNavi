@@ -46,9 +46,6 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     //PlacePickerは選択のたび生成/破棄されるみたいなのでここで生成しない
     //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
 
-    private int targetTimeParcent = 0;
-    private int duration = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,26 +76,6 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     public void onStart() {
         super.onStart();
         //TODO: onCreateだと時間的に準備が整っていないのでこっちでやってるが、onStart()はライフサイクル的にはリスタートされた後にも呼ばれる。なるべく一度しか呼ばれないところに移すべき。
-        final TextView targetTimeInformation = (TextView) findViewById(R.id.targetTimeInformation);
-        //シークバーの挙動をセット
-        ((SeekBar) this.findViewById(R.id.timebar)).setOnSeekBarChangeListener(
-                new SeekBar.OnSeekBarChangeListener() {
-                    public void onProgressChanged(SeekBar seekBar,
-                                                  int progress, boolean fromUser) {
-                        // ツマミをドラッグしたときに呼ばれる
-                    }
-
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        // ツマミに触れたときに呼ばれる
-                    }
-
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        //ツマミを離したときに呼ばれる
-                        targetTimeParcent = seekBar.getProgress();
-                        targetTimeInformation.setText("TARGET DURATION: " + duration * targetTimeParcent * 0.01 + "sec (" + targetTimeParcent + "%)");
-                    }
-                }
-        );
     }
 
     //PlacePicker上で目的地が選択された場合に呼ばれるコールバックメソッド(使い方あってる...?)
@@ -115,8 +92,9 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         }
 
         //時間と距離の表示
-        if (origin != null && destination != null)
-            getDistance(origin.getLatLng(), destination.getLatLng());
+        if (origin != null && destination != null) {
+            settingMenuFragment.setDirectionInformation(origin.getLatLng(), destination.getLatLng());
+        }
     }
 
     //SettingMenuFragment上のボタンが押された時に呼ばれるコールバックメソッド
@@ -143,7 +121,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             intent.putExtra("DestLng", destination.getLatLng().longitude);
             intent.putExtra("OriginLat", origin.getLatLng().latitude);
             intent.putExtra("OriginLng", origin.getLatLng().longitude);
-            intent.putExtra("TargetTimePercent", targetTimeParcent);
+            intent.putExtra("TargetTimePercent", settingMenuFragment.targetTimeParcent);
             startActivity(intent);
 
             return;
@@ -169,74 +147,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    //GoogleDistanceAPIで距離と時間を計算してもらう
-    //TODO: あちこちに分散してるGoogleMapsAPIやGoogleDistanceMatrixAPIやらを使う部分を一つのクラスにまとめる(API使ってのデータ取得以外の仕事はこっちで実装したいのでlistnerとか使って、取得処理終了時にコールバックメソッドを呼ばせる?)
-    public void getDistance(LatLng origin, LatLng destination) {
-        if (origin == null || destination == null) {
-            Log.d("MainActivity", "getDistance error. origin or destination is null.");
-            return;
-        }
 
-        String urlString = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" + origin.latitude + "," + origin.longitude + "&destinations=" + destination.latitude + "," + destination.longitude + "&key=AIzaSyDU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58";
-        final TextView distanceInfo = (TextView) this.findViewById(R.id.distanceInformation);
-
-        new AsyncTask<String, Void, String>() {
-            @Override
-            protected String doInBackground(String... strUrl) {
-                String data = "";
-                InputStream iStream = null;
-                HttpURLConnection urlConnection = null;
-                URL url = null;
-                try {
-                    url = new URL(strUrl[0]);
-
-                    // Creating an http connection to communicate with url
-                    urlConnection = (HttpURLConnection) url.openConnection();
-
-                    // Connecting to url
-                    urlConnection.connect();
-
-                    // Reading data from url
-                    iStream = urlConnection.getInputStream();
-
-                    BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-                    StringBuffer sb = new StringBuffer();
-
-                    String line = "";
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
-                    }
-
-                    data = sb.toString();
-                    Log.d("downloadUrl", data.toString());
-                    br.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                Log.d("Background Task data", data.toString());
-
-                return data;
-            }
-
-            @Override
-            protected void onPostExecute(String result) {
-                super.onPostExecute(result);
-                try {
-                    JSONObject distanceResult = new JSONObject(result);
-                    JSONObject element = distanceResult.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0);
-                    JSONObject distanceJson = element.getJSONObject("distance");
-                    JSONObject durationJson = element.getJSONObject("duration");
-                    Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distanceJson.getString("text") + " DURATION: " + durationJson.getString("text"));
-                    distanceInfo.setText("DISTANCE: " + distanceJson.getString("text") + "       DURATION: " + durationJson.getString("text"));
-                    duration = durationJson.getInt("value");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.execute(urlString);
-    }
 
 
 }

@@ -59,7 +59,6 @@ import java.util.concurrent.TimeUnit;
 
 //ナビゲーション画面のコントローラとなるアクティビティです
 //位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentと　NavigationInformationFragmentに渡します。
-//FusedLocationなんとかが使われてるけど、現在使っていません。(ルートの案内にGeoFenceを使うように変更したため)
 public class NavigationControlActivity extends Activity {
     final int REQUEST_LOCATION = 1;
     LatLng destination;
@@ -95,7 +94,7 @@ public class NavigationControlActivity extends Activity {
         FragmentManager fragmentManager = getFragmentManager();
         navigationMapFragment = (NavigationMapFragment) fragmentManager.findFragmentById(R.id.navigationMapFragment);
         navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
-        
+
         Log.d("NaviControlActivity", "mGoogleApiClient");
 
         //ルートのセットを開始

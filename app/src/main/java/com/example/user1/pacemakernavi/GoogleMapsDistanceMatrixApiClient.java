@@ -30,7 +30,7 @@ public class GoogleMapsDistanceMatrixApiClient {
 
     }
 
-    public void fetchData(LatLng origin, LatLng destination, GoogleMapsDistanceMatrixApiClient.GoogleMapsDistanceMatrixApiListner caller) {
+    public static void fetchData(LatLng origin, LatLng destination, GoogleMapsDistanceMatrixApiClient.GoogleMapsDistanceMatrixApiListner caller) {
         if (origin == null || destination == null || caller == null) {
             Log.e("DistanceMatrixClient", "ORIGN or DEST or CALLER is null!");
             return;
@@ -70,13 +70,13 @@ public class GoogleMapsDistanceMatrixApiClient {
                     }
 
                     data = sb.toString();
-                    Log.d("downloadUrl", data.toString());
+                    Log.d("GMDistanceMatrixClient", data.toString());
                     br.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                Log.d("Background Task data", data.toString());
+                Log.d("GMDistanceMatrixClient", data.toString());
                 return data;
             }
 
@@ -89,7 +89,7 @@ public class GoogleMapsDistanceMatrixApiClient {
                     JSONObject element = distanceResult.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0);
                     JSONObject distanceJson = element.getJSONObject("distance");
                     JSONObject durationJson = element.getJSONObject("duration");
-                    Log.i("MainActivity", "DistanceMatrixAPI: DISTANCE: " + distanceJson.getString("text") + " DURATION: " + durationJson.getString("text"));
+                    Log.i("GMDistanceMatrixClient", "DistanceMatrixAPI: DISTANCE: " + distanceJson.getString("text") + " DURATION: " + durationJson.getString("text"));
 
                     //呼び出し元のコールバックメソッドを呼び出して、結果を渡す
                     methodCaller.onResultOfGoogleMapsDistanceMatrixApi(result);
@@ -102,7 +102,7 @@ public class GoogleMapsDistanceMatrixApiClient {
     }
 
     //リクエストのためのURL生成
-    private String generateUrl(LatLng origin, LatLng destination) {
+    private static String generateUrl(LatLng origin, LatLng destination) {
         return "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" + origin.latitude + "," + origin.longitude + "&destinations=" + destination.latitude + "," + destination.longitude + "&key=AIzaSyDU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58";
     }
 
