@@ -19,7 +19,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -174,19 +173,50 @@ public class NavigationInformationFragment extends Fragment implements
 
     }
 
+    float speedAccumulator = 0.0f; /*ユーザーの平均スピード*/
+    int lastStepsIndex = stepsIndex; /*前回、速度更新をしたときのstepのインデックス*/
+    int speedLogIndex = 0; /*通算何回、速度更新をしたか*/
+    ArrayList<Float> speedLog = new ArrayList<>(); /*過去500回ぶんのスピードのログ*/
+
     //画面に表示する、進む速度を更新
     public void setUserSpeed(float speed) {
         //速度評価の許容範囲
         //TODO: 移動手段や速度によって許容範囲を変える。(歩きなら0.5程度だが自転車など速い移動手段を使うならもっと広げるべき)
         float tolerance = 0.5f;
+        String text = "";
 
-        TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
-        String text = "YOUR: " + speed + "m/s    GHOST: " + ghostSpeed + "m/s\n";
+        float averageSpeed;
+        //500回以上、このメソッドが呼ばれているなら
+        if (speedLog.size() >= 500) {
+            //speedAccumulatorが500回ぶんの速度の積算になるように、ちょうど500回まえに記録された速度を引き算する。
+            speedAccumulator -= speedLog.get(speedLogIndex);
+        }
+
+        //speedAccumulatorには、過去500回ぶんの速度が積算される
+        speedAccumulator += speed;
+        //ログにも500回ぶんの速度が記録される
+        speedLog.add(speedLogIndex, speed);
+        //500回まえに記録されたspeedLogのインデックスを計算する
+        speedLogIndex++;
+        speedLogIndex %= 500;
+
+        //500回以上、このメソッドが呼ばれているなら
+        if (speedLog.size() >= 500) {
+            averageSpeed = speedAccumulator / 500;
+        } else {
+            averageSpeed = speedAccumulator / speedLogIndex;
+        }
 
         //速度によって、ペース通りかどうか評価を変える。
-        if (speed > ghostSpeed + tolerance) text += "TOO FAST! SLOW DOWN";
-        else if (speed >= ghostSpeed - tolerance) text += "GOOD PACE";
-        else text += "HURRY UP! YOU ARE LATE";
+        if (speed > ghostSpeed + tolerance) text += "↑";
+        else if (speed >= ghostSpeed - tolerance) text += "=";
+        else text += "↓";
+
+        DecimalFormat df1 = new DecimalFormat("0");
+        df1.setMaximumFractionDigits(2);
+        df1.setMinimumFractionDigits(2);
+        TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
+        text += "YOUR: " + df1.format(speed) + "m/s" + "AVE: " + df1.format(averageSpeed) + "GHOST: " + df1.format(ghostSpeed) + "m/s\n";
 
         userSpeedInfo.setText(text);
     }
@@ -226,7 +256,9 @@ public class NavigationInformationFragment extends Fragment implements
     public void onGhostLocationChanged(PolylineOptions ghostFootprint) {
         //主にゴーストのプログレスバーまわりの更新作業
         float ghostProgressDistance = calculatePolylineLength(ghostFootprint);
-        DecimalFormat df1 = new DecimalFormat("0.00");
+        DecimalFormat df1 = new DecimalFormat("0");
+        df1.setMaximumFractionDigits(2);
+        df1.setMinimumFractionDigits(2);
         ((ProgressBar) getActivity().findViewById(R.id.GhostProgressBar)).setProgress((int) (ghostProgressDistance / routeDistance * 100));
         ((TextView) getActivity().findViewById(R.id.ProgressValueOfGhost)).setText(df1.format(ghostProgressDistance / 1000) + " km");
         Log.d("NaviInfo", "Gfootprint" + calculatePolylineLength(ghostFootprint) + "  routeDist" + routeDistance + "   = " + (calculatePolylineLength(ghostFootprint) / routeDistance * 100));
@@ -243,7 +275,9 @@ public class NavigationInformationFragment extends Fragment implements
 
         //ユーザーのプログレスバーまわりの更新
         float userProgressDistance = calculatePolylineLength(footprint);
-        DecimalFormat df1 = new DecimalFormat("0.00");
+        DecimalFormat df1 = new DecimalFormat("0");
+        df1.setMaximumFractionDigits(2);
+        df1.setMinimumFractionDigits(2);
         ((ProgressBar) getActivity().findViewById(R.id.UserProgressBar)).setProgress((int) (userProgressDistance / routeDistance * 100));
         ((TextView) getActivity().findViewById(R.id.ProgressValueOfUser)).setText(df1.format(userProgressDistance / 1000) + " km");
         Log.d("NaviInfo", "Userfootprint" + calculatePolylineLength(footprint) + "  routeDist" + routeDistance + "   = " + (calculatePolylineLength(footprint) / routeDistance * 100));
@@ -265,7 +299,9 @@ public class NavigationInformationFragment extends Fragment implements
             }
         }
 
-        DecimalFormat df1 = new DecimalFormat("0.00");
+        DecimalFormat df1 = new DecimalFormat("0");
+        df1.setMaximumFractionDigits(2);
+        df1.setMinimumFractionDigits(2);
         //ちゃんとルートを辿っている場合、現在地から次の指示地点までの距離 = (スタートから次の指示地点までの距離) - (スタートから現在地までの距離)
         //しかしルートを外れると、現在地-指示地点間の距離を計算しているワケではないこの計算は狂うことに注意！
         float dist = nextStepsDist - calculatePolylineLength(userFootprint);
