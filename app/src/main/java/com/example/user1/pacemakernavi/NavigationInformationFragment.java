@@ -34,7 +34,8 @@ import java.util.ArrayList;
 public class NavigationInformationFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        GhostRendererOnMapService.GhostLocationListner {
     TextView instructionField; //行程の指示(xx交差点で右)の表示部
     JSONArray jsonSteps; //行程(ルート検索で帰って来るJSONでいうsteps)
     int stepsIndex = 0; //行程のインデックス
@@ -205,6 +206,11 @@ public class NavigationInformationFragment extends Fragment implements
 
         }
         return totalDistance;
+    }
+
+    @Override
+    public void onGhostLocationChange(PolylineOptions ghostFootprint) {
+
     }
 
     //移動したら進んでる速度を更新

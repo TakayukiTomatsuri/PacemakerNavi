@@ -84,7 +84,7 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
         //ゴーストを描画してくれるスレッドを起動
         Log.d("NaviMapActivity", "START GHOST");
         try {
-            GhostRendererOnMapService ghost = new GhostRendererOnMapService(navigationMapFragment.mMap);
+            GhostRendererOnMapService ghost = new GhostRendererOnMapService(navigationMapFragment.mMap, navigationInformationFragment);
             //開始させるときに、ゴーストのスピードも指定する(通常の何パーセントの時間で進むか)
             ghost.execute(result, new Integer(targetTimePercent).toString());
         } catch (Exception e) {
