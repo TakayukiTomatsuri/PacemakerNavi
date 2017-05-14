@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -46,6 +48,7 @@ public class NavigationInformationFragment extends Fragment implements
 
     PolylineOptions footprint = new PolylineOptions();
     long lastUpdateofFootprint = 0;
+    int routeDistance = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,8 @@ public class NavigationInformationFragment extends Fragment implements
 
         try {
             jsonSteps = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
+            //総行程の距離をもらっとく(ここでは使わないのに。スパゲッティコード！！！)
+            routeDistance = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONObject("distance").getInt("value");
             //ジオフェンスは一度に100個以上は登録できないので、一応お知らせする
             if (jsonSteps.length() >= 100) {
                 Log.e("NaviInfoFragment", "Too many steps in route!");
@@ -190,7 +195,7 @@ public class NavigationInformationFragment extends Fragment implements
     }
 
     //ポリラインの長さを計算する
-    protected float calculateMiles(PolylineOptions points) {
+    protected float calculatePolylineLength(PolylineOptions points) {
         float totalDistance = 0;
 
         for (int i = 1; i < points.getPoints().size(); i++) {
@@ -199,8 +204,8 @@ public class NavigationInformationFragment extends Fragment implements
             currLocation.setLongitude(points.getPoints().get(i).longitude);
 
             Location lastLocation = new Location("this");
-            currLocation.setLatitude(points.getPoints().get(i - 1).latitude);
-            currLocation.setLongitude(points.getPoints().get(i - 1).longitude);
+            lastLocation.setLatitude(points.getPoints().get(i - 1).latitude);
+            lastLocation.setLongitude(points.getPoints().get(i - 1).longitude);
 
             totalDistance += lastLocation.distanceTo(currLocation);
 
@@ -208,9 +213,14 @@ public class NavigationInformationFragment extends Fragment implements
         return totalDistance;
     }
 
+    //ゴーストが移動したら呼ばれる
     @Override
     public void onGhostLocationChange(PolylineOptions ghostFootprint) {
-
+        float ghostProgress = calculatePolylineLength(ghostFootprint);
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        ((ProgressBar) getActivity().findViewById(R.id.GhostProgressBar)).setProgress((int) (ghostProgress / routeDistance * 100));
+        ((TextView) getActivity().findViewById(R.id.ProgressValueOfGhost)).setText(df1.format(ghostProgress / 1000) + " km");
+        Log.d("NaviInfo", "Gfootprint" + calculatePolylineLength(ghostFootprint) + "  routeDist" + routeDistance + "   = " + (calculatePolylineLength(ghostFootprint) / routeDistance * 100));
     }
 
     //移動したら進んでる速度を更新
