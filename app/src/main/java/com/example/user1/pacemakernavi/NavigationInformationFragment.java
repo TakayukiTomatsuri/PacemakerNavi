@@ -185,8 +185,8 @@ public class NavigationInformationFragment extends Fragment implements
         float tolerance = 0.5f;
         String text = "";
 
-        float averageSpeed;
-        //500回以上、このメソッドが呼ばれているなら
+        float averageSpeed = 0.0f;
+        //500回以上、この平均速度計算が行われているなら
         if (speedLog.size() >= 500) {
             //speedAccumulatorが500回ぶんの速度の積算になるように、ちょうど500回まえに記録された速度を引き算する。
             speedAccumulator -= speedLog.get(speedLogIndex);
@@ -200,7 +200,7 @@ public class NavigationInformationFragment extends Fragment implements
         speedLogIndex++;
         speedLogIndex %= 500;
 
-        //500回以上、このメソッドが呼ばれているなら
+        //500回以上、この平均速度計算が行われているなら
         if (speedLog.size() >= 500) {
             averageSpeed = speedAccumulator / 500;
         } else {
@@ -216,7 +216,7 @@ public class NavigationInformationFragment extends Fragment implements
         df1.setMaximumFractionDigits(2);
         df1.setMinimumFractionDigits(2);
         TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
-        text += "YOUR: " + df1.format(speed) + "m/s" + "AVE: " + df1.format(averageSpeed) + "GHOST: " + df1.format(ghostSpeed) + "m/s\n";
+        text += "YOUR: " + df1.format(speed) + "m/s" + "   AVE: " + df1.format(averageSpeed) + "m/s   GHOST: " + df1.format(ghostSpeed) + "m/s\n";
 
         userSpeedInfo.setText(text);
     }

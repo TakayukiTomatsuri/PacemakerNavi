@@ -86,8 +86,8 @@
         android:id="@+id/instruction"
         android:layout_width="match_parent"
 
-        android:layout_height="0dp"
-        android:layout_weight="0.55"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.39"
         android:background="#ffd000"
         android:text="NEXT STEP INSTRUCTION"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
@@ -109,9 +109,9 @@
     <TextView
         android:id="@+id/speed"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.19"
+        android:layout_height="108dp"
         android:text="YOUR: n/a   GHOST: n/a"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_weight="0.09" />
     android:background="#f4e754"/>
 </LinearLayout>
