@@ -33,10 +33,17 @@ import java.util.List;
 public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions, Void> {
     GoogleMap mMap = null;
     int targetTimePercent = 0;
+    GhostLocationListner listner = null;
 
-    public GhostRendererOnMapService(GoogleMap map) {
+
+    public GhostRendererOnMapService(GoogleMap map, GhostLocationListner listner) {
         super();
         mMap = map;
+        this.listner = listner;
+    }
+
+    public interface GhostLocationListner {
+        public void onGhostLocationChange(PolylineOptions ghostFootprint);
     }
 
     // doInBackgroundの事前準備処理（UIスレッド）
@@ -94,6 +101,7 @@ public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions
     protected void onProgressUpdate(PolylineOptions... polyline) {
         // ポリラインを描画する
         mMap.addPolyline(polyline[0]);
+        listner.onGhostLocationChange(polyline[0]);
     }
 
 }

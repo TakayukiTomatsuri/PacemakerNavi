@@ -4,6 +4,84 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/TextView"
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:text="Ghost" />
+
+        <ProgressBar
+            android:id="@+id/GhostProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/ProgressValueOfGhost"
+            android:layout_width="69dp"
+            android:layout_height="wrap_content"
+            android:text="0 km" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:text="You" />
+
+        <ProgressBar
+            android:id="@+id/UserProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/ProgressValueOfUser"
+            android:layout_width="69dp"
+            android:layout_height="wrap_content"
+            android:text="0km" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="51dp"
+            android:layout_height="wrap_content"
+            android:text="Route" />
+
+        <ProgressBar
+            android:id="@+id/RouteProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/ProgressValueOfRoute"
+            android:layout_width="69dp"
+            android:layout_height="wrap_content"
+            android:text="0km" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/instruction"
         android:layout_width="match_parent"
@@ -12,7 +90,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:layout_weight="0.55"
         android:layout_height="0dp"
-
         />
 
     <TextView
@@ -20,9 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.19"
-
-
         android:text="YOUR: n/a   GHOST: n/a"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
+    android:background="#f4e754"/>
 </LinearLayout>

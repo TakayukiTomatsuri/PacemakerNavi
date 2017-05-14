@@ -18,6 +18,8 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.vision.text.Text;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +42,9 @@ public class NavigationInformationFragment extends Fragment implements
     private GoogleApiClient locationClient = null;
     private float ghostSpeed = 0;   //速度の表示に使うだけの値
     ArrayList<Geofence> mGeofenceList = new ArrayList<>(); //行程のエンドポイントに到達したかどうかを判断するためのジオフェンスたち
+
+    PolylineOptions footprint = new PolylineOptions();
+    long lastUpdateofFootprint = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,6 +176,35 @@ public class NavigationInformationFragment extends Fragment implements
         else text += "HURRY UP! YOU ARE LATE";
 
         userSpeedInfo.setText(text);
+    }
+
+    //足跡のアップデート
+    public void updateFootprint(Location currentLocation) {
+        long now = System.currentTimeMillis();
+        //1分に一回、更新する
+        if (now - lastUpdateofFootprint > 1 * 60 * 1000) {
+            footprint.add(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
+            lastUpdateofFootprint = now;
+        }
+    }
+
+    //ポリラインの長さを計算する
+    protected float calculateMiles(PolylineOptions points) {
+        float totalDistance = 0;
+
+        for (int i = 1; i < points.getPoints().size(); i++) {
+            Location currLocation = new Location("this");
+            currLocation.setLatitude(points.getPoints().get(i).latitude);
+            currLocation.setLongitude(points.getPoints().get(i).longitude);
+
+            Location lastLocation = new Location("this");
+            currLocation.setLatitude(points.getPoints().get(i - 1).latitude);
+            currLocation.setLongitude(points.getPoints().get(i - 1).longitude);
+
+            totalDistance += lastLocation.distanceTo(currLocation);
+
+        }
+        return totalDistance;
     }
 
     //移動したら進んでる速度を更新
