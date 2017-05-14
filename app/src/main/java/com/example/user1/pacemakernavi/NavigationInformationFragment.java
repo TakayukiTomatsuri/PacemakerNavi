@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
@@ -188,7 +190,8 @@ public class NavigationInformationFragment extends Fragment implements
     public void updateFootprint(Location currentLocation) {
         long now = System.currentTimeMillis();
         //1分に一回、更新する
-        if (now - lastUpdateofFootprint > 1 * 60 * 1000) {
+        int intervalMinute = 1;
+        if (now - lastUpdateofFootprint > intervalMinute * 60 * 1000) {
             footprint.add(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
             lastUpdateofFootprint = now;
         }
@@ -232,11 +235,35 @@ public class NavigationInformationFragment extends Fragment implements
 
         //足跡を更新
         updateFootprint(location);
+
         //ユーザーのプログレスバーまわりの更新
         float userProgressDistance = calculatePolylineLength(footprint);
         DecimalFormat df1 = new DecimalFormat("0.00");
         ((ProgressBar) getActivity().findViewById(R.id.UserProgressBar)).setProgress((int) (userProgressDistance / routeDistance * 100));
         ((TextView) getActivity().findViewById(R.id.ProgressValueOfUser)).setText(df1.format(userProgressDistance / 1000) + " km");
         Log.d("NaviInfo", "Userfootprint" + calculatePolylineLength(footprint) + "  routeDist" + routeDistance + "   = " + (calculatePolylineLength(footprint) / routeDistance * 100));
+
+        //指示の詳細を更新
+        updateInstructionDetail(footprint);
+    }
+
+    public void updateInstructionDetail(PolylineOptions userFootprint) {
+
+        //まずスタートから次の指示地点までの距離を計算する
+        int ind_steps = 0;
+        int nextStepsDist = 0;
+        for (; ind_steps <= stepsIndex; ind_steps++) {
+            try {
+                nextStepsDist += jsonSteps.getJSONObject(ind_steps).getJSONObject("distance").getInt("value");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        //ちゃんとルートを辿っている場合、現在地から次の指示地点までの距離 = (スタートから次の指示地点までの距離) - (スタートから現在地までの距離)
+        //しかしルートを外れると、現在地-指示地点間の距離を計算しているワケではないこの計算は狂うことに注意！
+        float dist = nextStepsDist - calculatePolylineLength(userFootprint);
+        ((TextView) getActivity().findViewById(R.id.instructionDetail)).setText(Html.fromHtml("あと <b>" + df1.format(dist / 1000) + "</b>km"));
     }
 }
