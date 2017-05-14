@@ -86,17 +86,25 @@
         android:id="@+id/instruction"
         android:layout_width="match_parent"
 
-        android:text="NEXT STEP INSTRUCTION"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:layout_weight="0.55"
         android:layout_height="0dp"
-        />
+        android:layout_weight="0.55"
+        android:background="#ffd000"
+        android:text="NEXT STEP INSTRUCTION"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#000000" />
+
 
     <TextView
         android:id="@+id/instructionDetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="あと 0km. 残り0分" />
+        android:background="#ffd000"
+        android:text="あと 0km"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
     <TextView
         android:id="@+id/speed"

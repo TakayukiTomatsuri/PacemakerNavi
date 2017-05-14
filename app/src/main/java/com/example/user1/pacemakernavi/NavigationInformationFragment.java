@@ -73,9 +73,14 @@ public class NavigationInformationFragment extends Fragment implements
         final int radius = 20;
 
         try {
-            jsonSteps = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
             //総行程の距離をもらっとく(ここでは使わないのに。スパゲッティコード！！！)
             routeDistance = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONObject("distance").getInt("value");
+            //routeプログレスバーの初期化。ここでやらなくてもいい。けど総行程を求めたついで
+            ((ProgressBar) getActivity().findViewById(R.id.RouteProgressBar)).setProgress(100);
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            ((TextView) getActivity().findViewById(R.id.ProgressValueOfRoute)).setText(df1.format((float) routeDistance / 1000) + "km");
+
+            jsonSteps = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
             //ジオフェンスは一度に100個以上は登録できないので、一応お知らせする
             if (jsonSteps.length() >= 100) {
                 Log.e("NaviInfoFragment", "Too many steps in route!");
@@ -110,7 +115,7 @@ public class NavigationInformationFragment extends Fragment implements
 
         try {
             //行程の指示の表示を更新
-            instructionField.setText(jsonSteps.getJSONObject(stepsIndex).getString("html_instructions"));
+            instructionField.setText(Html.fromHtml(jsonSteps.getJSONObject(stepsIndex).getString("html_instructions")));
             //ゴーストの速度(ただの数字の表示用)を更新
             JSONObject jsonDuration = jsonSteps.getJSONObject(stepsIndex).getJSONObject("duration");
             JSONObject jsonDistance = jsonSteps.getJSONObject(stepsIndex).getJSONObject("distance");

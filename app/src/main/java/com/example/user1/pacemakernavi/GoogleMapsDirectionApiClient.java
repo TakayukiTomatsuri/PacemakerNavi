@@ -95,8 +95,10 @@ public class GoogleMapsDirectionApiClient {
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         // Sensor enabled
         String sensor = "sensor=false";
+        // priority language
+        String language = "language=ja";
         // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor;
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + language;
         // Output format
         String output = "json";
         // Building the url to the web service
