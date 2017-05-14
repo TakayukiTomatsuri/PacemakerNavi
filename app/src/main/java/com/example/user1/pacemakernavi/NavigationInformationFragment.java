@@ -215,17 +215,28 @@ public class NavigationInformationFragment extends Fragment implements
 
     //ゴーストが移動したら呼ばれる
     @Override
-    public void onGhostLocationChange(PolylineOptions ghostFootprint) {
-        float ghostProgress = calculatePolylineLength(ghostFootprint);
+    public void onGhostLocationChanged(PolylineOptions ghostFootprint) {
+        //主にゴーストのプログレスバーまわりの更新作業
+        float ghostProgressDistance = calculatePolylineLength(ghostFootprint);
         DecimalFormat df1 = new DecimalFormat("0.00");
-        ((ProgressBar) getActivity().findViewById(R.id.GhostProgressBar)).setProgress((int) (ghostProgress / routeDistance * 100));
-        ((TextView) getActivity().findViewById(R.id.ProgressValueOfGhost)).setText(df1.format(ghostProgress / 1000) + " km");
+        ((ProgressBar) getActivity().findViewById(R.id.GhostProgressBar)).setProgress((int) (ghostProgressDistance / routeDistance * 100));
+        ((TextView) getActivity().findViewById(R.id.ProgressValueOfGhost)).setText(df1.format(ghostProgressDistance / 1000) + " km");
         Log.d("NaviInfo", "Gfootprint" + calculatePolylineLength(ghostFootprint) + "  routeDist" + routeDistance + "   = " + (calculatePolylineLength(ghostFootprint) / routeDistance * 100));
     }
 
-    //移動したら進んでる速度を更新
+
     @Override
     public void onLocationChanged(Location location) {
+        //移動したら進んでる速度を更新
         setUserSpeed(location.getSpeed());
+
+        //足跡を更新
+        updateFootprint(location);
+        //ユーザーのプログレスバーまわりの更新
+        float userProgressDistance = calculatePolylineLength(footprint);
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        ((ProgressBar) getActivity().findViewById(R.id.UserProgressBar)).setProgress((int) (userProgressDistance / routeDistance * 100));
+        ((TextView) getActivity().findViewById(R.id.ProgressValueOfUser)).setText(df1.format(userProgressDistance / 1000) + " km");
+        Log.d("NaviInfo", "Userfootprint" + calculatePolylineLength(footprint) + "  routeDist" + routeDistance + "   = " + (calculatePolylineLength(footprint) / routeDistance * 100));
     }
 }

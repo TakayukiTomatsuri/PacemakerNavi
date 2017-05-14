@@ -1,27 +1,15 @@
 package com.example.user1.pacemakernavi;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.IBinder;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -43,7 +31,8 @@ public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions
     }
 
     public interface GhostLocationListner {
-        public void onGhostLocationChange(PolylineOptions ghostFootprint);
+        //ゴーストが移動したことをこれで通知する
+        public void onGhostLocationChanged(PolylineOptions ghostFootprint);
     }
 
     // doInBackgroundの事前準備処理（UIスレッド）
@@ -101,7 +90,7 @@ public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions
     protected void onProgressUpdate(PolylineOptions... polyline) {
         // ポリラインを描画する
         mMap.addPolyline(polyline[0]);
-        listner.onGhostLocationChange(polyline[0]);
+        listner.onGhostLocationChanged(polyline[0]);
     }
 
 }
