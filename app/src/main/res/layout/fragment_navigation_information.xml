@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--- ナビゲーション画面の下半分の、インフォーメーション欄。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
@@ -58,7 +59,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="16dp"
         android:orientation="horizontal">
 
         <TextView
@@ -67,12 +68,14 @@
             android:layout_height="wrap_content"
             android:text="Route" />
 
-        <ProgressBar
-            android:id="@+id/RouteProgressBar"
-            style="?android:attr/progressBarStyleHorizontal"
+        <ImageView
+            android:id="@+id/userProgressBarImage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_height="10dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            android:src="@drawable/dummy1"
+            app:srcCompat="@color/cast_intro_overlay_button_background_color" />
 
         <TextView
             android:id="@+id/ProgressValueOfRoute"
@@ -113,5 +116,14 @@
         android:text="YOUR: n/a   GHOST: n/a"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:layout_weight="0.09" />
+
+    <ProgressBar
+        android:id="@+id/RouteProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" /><![CDATA[
+
     android:background="#f4e754"/>
+]]>
 </LinearLayout>

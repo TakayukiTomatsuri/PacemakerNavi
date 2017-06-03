@@ -3,6 +3,10 @@ package com.example.user1.pacemakernavi;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.Html;
@@ -10,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +31,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -102,7 +109,8 @@ public class NavigationInformationFragment extends Fragment implements
             e.printStackTrace();
         }
 
-
+        //関係ないのにデータの準備が整う順序の関係でここでやる!
+        setRouteProgressBar();  //ルートプログレスバーの設定
     }
 
     //呼ぶたびに行程を一個ずつ進める。何番目の行程、とか指定した方がいいかもしれない。
@@ -146,6 +154,7 @@ public class NavigationInformationFragment extends Fragment implements
         super.onStart();
         //xx交差点を右、とかいう指示を表示するテキストフィールド
         instructionField = (TextView) getActivity().findViewById(R.id.instruction);
+
     }
 
 
@@ -185,6 +194,11 @@ public class NavigationInformationFragment extends Fragment implements
         float tolerance = 0.5f;
         String text = "";
 
+        /*
+            過去500回ぶんのデータから平均をとる
+            (毎回500回の足し算を行わなくて良いように、単純移動平均を計算してるのでこういうメンドくさいことになる)
+         */
+
         float averageSpeed = 0.0f;
         //500回以上、この平均速度計算が行われているなら
         if (speedLog.size() >= 500) {
@@ -221,7 +235,7 @@ public class NavigationInformationFragment extends Fragment implements
         userSpeedInfo.setText(text);
     }
 
-    //足跡のアップデート
+    //ユーザー足跡のアップデート
     public void updateFootprint(Location currentLocation) {
         long now = System.currentTimeMillis();
         //1分に一回、更新する
@@ -307,4 +321,40 @@ public class NavigationInformationFragment extends Fragment implements
         float dist = nextStepsDist - calculatePolylineLength(userFootprint);
         ((TextView) getActivity().findViewById(R.id.instructionDetail)).setText(Html.fromHtml("あと <b>" + df1.format(dist / 1000) + "</b>km"));
     }
+
+    //ルート表示用のプログレスバーを表示(標準のプログレスバーだとできないみたいなので画像合成してる)
+    public void setRouteProgressBar() {
+        try {
+            //プログレスバーを描くための素材
+            InputStream istream = getResources().getAssets().open("routeDot.bmp");
+            Bitmap routeDotBitmap = BitmapFactory.decodeStream(istream);
+            istream = getResources().getAssets().open("routeBar.bmp");
+            Bitmap routeBarBitmap = BitmapFactory.decodeStream(istream);
+
+            int width = routeBarBitmap.getWidth(); // 元ファイルの幅取得
+            int height = routeBarBitmap.getHeight(); // 元ファイルの高さ取得
+            Bitmap newbitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(newbitmap);  //元となるキャンバスの作成
+            canvas.drawBitmap(routeBarBitmap, 0, 0, (Paint) null);
+
+            //各経路ポイントの距離をみてルートプログレスバーに追加していく
+            for (int ind = 0; ind < jsonSteps.length(); ind++) {
+                try {
+                    int dist = jsonSteps.getJSONObject(ind).getJSONObject("distance").getInt("value");
+                    int newX = (int) (((double) dist / routeDistance) * width); //プログレスバー上の、経路ポイントの合成位置
+                    canvas.drawBitmap(routeDotBitmap, newX, 0, (Paint) null); // 画像合成
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            ImageView imageView = (ImageView) getActivity().findViewById(R.id.userProgressBarImage);
+            imageView.setImageBitmap(newbitmap);    //合成結果の画像の表示
+
+            //imageView.setImageResource(R.drawable.dummy2);  //テストのためのダミー
+        } catch (IOException e) {
+            Log.d("Assets", "Error");
+        }
+    }
+
 }
