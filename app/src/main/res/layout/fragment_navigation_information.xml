@@ -93,6 +93,7 @@
         android:layout_weight="0.39"
         android:background="#ffd000"
         android:text="NEXT STEP INSTRUCTION"
+        android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
 
     <View
@@ -107,6 +108,7 @@
         android:layout_height="wrap_content"
         android:background="#ffd000"
         android:text="あと 0km"
+        android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
     <TextView
@@ -115,15 +117,11 @@
         android:layout_height="108dp"
         android:text="YOUR: n/a   GHOST: n/a"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:layout_weight="0.09" />
+        android:layout_weight="0.09" /><![CDATA[
 
-    <ProgressBar
-        android:id="@+id/RouteProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" /><![CDATA[
+
 
     android:background="#f4e754"/>
+
 ]]>
 </LinearLayout>

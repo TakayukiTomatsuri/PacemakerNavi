@@ -81,8 +81,7 @@ public class NavigationInformationFragment extends Fragment implements
         try {
             //総行程の距離をもらっとく(ここでは使わないのに。スパゲッティコード！！！)
             routeDistance = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONObject("distance").getInt("value");
-            //routeプログレスバーの初期化。ここでやらなくてもいい。けど総行程を求めたついで
-            ((ProgressBar) getActivity().findViewById(R.id.RouteProgressBar)).setProgress(100);
+
             DecimalFormat df1 = new DecimalFormat("0.00");
             ((TextView) getActivity().findViewById(R.id.ProgressValueOfRoute)).setText(df1.format((float) routeDistance / 1000) + "km");
 
@@ -110,6 +109,7 @@ public class NavigationInformationFragment extends Fragment implements
         }
 
         //関係ないのにデータの準備が整う順序の関係でここでやる!
+        //TODO:画面のパーツの設定とかをしかるべきとこでまとめてやるようにしたほうがいい
         setRouteProgressBar();  //ルートプログレスバーの設定
     }
 
@@ -222,17 +222,17 @@ public class NavigationInformationFragment extends Fragment implements
         }
 
         //速度によって、ペース通りかどうか評価を変える。
-        if (speed > ghostSpeed + tolerance) text += "↑";
-        else if (speed >= ghostSpeed - tolerance) text += "=";
-        else text += "↓";
+        if (speed > ghostSpeed + tolerance) text += "<font color=red>↑</font>";
+        else if (speed >= ghostSpeed - tolerance) text += "<font color=green>=</font>";
+        else text += " <font color=blue>↓</font>";
 
         DecimalFormat df1 = new DecimalFormat("0");
         df1.setMaximumFractionDigits(2);
         df1.setMinimumFractionDigits(2);
         TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
-        text += "YOUR: " + df1.format(speed) + "m/s" + "   AVE: " + df1.format(averageSpeed) + "m/s   GHOST: " + df1.format(ghostSpeed) + "m/s\n";
+        text += "<small>YOUR:</small> " + df1.format(speed) + "<small>m/s</small>" + "   <small>AVE:</small> " + df1.format(averageSpeed) + "<small>m/s</small>   <small>GHOST:</small> " + df1.format(ghostSpeed) + "<small>m/s</small>\n";
 
-        userSpeedInfo.setText(text);
+        userSpeedInfo.setText(Html.fromHtml(text));
     }
 
     //ユーザー足跡のアップデート
