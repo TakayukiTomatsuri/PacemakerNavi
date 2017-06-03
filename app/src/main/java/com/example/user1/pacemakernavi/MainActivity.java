@@ -37,8 +37,6 @@ import java.net.URL;
 //メインとは名がついているけど、現状は起動時の設定画面をコントロールするだけのActivityです。
 public class MainActivity extends Activity implements  PlacePickerFragment.PlacePickerFragmentListener, SettingMenuFragment.SettingMenuFragmentListener {
 
-    private Place destination = null;   //セットされた目的地
-    private Place origin = null;    //セットされた出発地
     private boolean isChoosingDistination = true;   //現在、目的地or出発地のどちらをセットしている段階か
     final int REQUEST_LOCATION = 1; //requestCode。コールバックメソッド内で、どっから帰ってきたのかの識別に使うっぽい
     SettingMenuFragment settingMenuFragment = new SettingMenuFragment();    //セッティングメニューはアプリの中で常に一つ
@@ -82,17 +80,17 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
         Log.d("MainActivity", "PlacePicked!");
         //SettingMenu画面の目的地/出発地情報を変更します
         if(isChoosingDistination){
-            destination = chosenPlace;
+            GlobalAppInfoSingleton.getInstance().setDestination(chosenPlace);
             settingMenuFragment.setDestinationInfo(chosenPlace);
         }
         else{
-            origin = chosenPlace;
+            GlobalAppInfoSingleton.getInstance().setOrigin(chosenPlace);
             settingMenuFragment.setOriginInfo(chosenPlace);
         }
 
         //時間と距離の表示
-        if (origin != null && destination != null) {
-            settingMenuFragment.setDirectionInformation(origin.getLatLng(), destination.getLatLng());
+        if (GlobalAppInfoSingleton.getInstance().getOrigin() != null && GlobalAppInfoSingleton.getInstance().getDestination() != null) {
+            settingMenuFragment.setDirectionInformation(GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng(), GlobalAppInfoSingleton.getInstance().getDestination().getLatLng());
         }
     }
 
@@ -104,7 +102,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             Intent intent = new Intent(MainActivity.this, NavigationControlActivity.class);
 
             //設定されてない時のデフォルトのと出発地
-            if(origin == null || destination == null){
+            if (GlobalAppInfoSingleton.getInstance().getOrigin() == null || GlobalAppInfoSingleton.getInstance().getDestination() == null) {
                 Toast.makeText(this, "DEST or ORIGIN is null!", Toast.LENGTH_SHORT).show();
 
                 intent.putExtra("DestLat", 36.37202);
@@ -117,10 +115,10 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             }
 
             //ナビゲーションに目的地と出発地の座標を渡す(オブジェクトのまま渡したいがちょっと面倒なので)
-            intent.putExtra("DestLat", destination.getLatLng().latitude);
-            intent.putExtra("DestLng", destination.getLatLng().longitude);
-            intent.putExtra("OriginLat", origin.getLatLng().latitude);
-            intent.putExtra("OriginLng", origin.getLatLng().longitude);
+            intent.putExtra("DestLat", GlobalAppInfoSingleton.getInstance().getDestination().getLatLng().latitude);
+            intent.putExtra("DestLng", GlobalAppInfoSingleton.getInstance().getDestination().getLatLng().longitude);
+            intent.putExtra("OriginLat", GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng().latitude);
+            intent.putExtra("OriginLng", GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng().longitude);
             intent.putExtra("TargetTimePercent", settingMenuFragment.targetTimeParcent);
             startActivity(intent);
 

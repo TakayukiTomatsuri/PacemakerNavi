@@ -61,6 +61,8 @@ public class FusedLocationClientSingleton extends Application implements
                 .build();
 
         startFusedLocation();
+
+
     }
 
     //シングルトンパターンでは、インスタンスはこのクラスメソッドを介して行う
