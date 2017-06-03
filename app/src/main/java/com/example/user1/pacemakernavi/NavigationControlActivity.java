@@ -61,8 +61,8 @@ import java.util.concurrent.TimeUnit;
 //位置情報の監視、及び、設定された目的地と出発地からルートを検索して、情報をNavigationMapFragmentと　NavigationInformationFragmentに渡します。
 public class NavigationControlActivity extends Activity implements GoogleMapsDirectionApiClient.GoogleMapsDirectionApiReceiver {
     final int REQUEST_LOCATION = 1; //パーミッションかなにかリクエストするときにどこのリクエストだったかの識別のためのrequestCode。コールバックメソッド内で、どっから帰ってきたのかの識別に使うっぽい
-    LatLng destination; //目的地、MainActivityから渡される
-    LatLng origin;  //出発地、MainActivityから渡される
+    //    LatLng destination; //目的地、MainActivityから渡される
+//    LatLng origin;  //出発地、MainActivityから渡される
     NavigationMapFragment navigationMapFragment;    //配下のFragment、地図表示担当
     NavigationInformationFragment navigationInformationFragment;    //配下のFragment、画面下半分で情報表示担当
     private int targetTimePercent = 0;  //通常の何パーセントの時間で目標に到達するか(設定画面で設定したもの)
@@ -72,7 +72,7 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
     public void onResultOfGoogleMapsDirectionApi(String result) {
         try {
             //マップにルート情報を設定(NavigationMapFragmentにてMapの準備ができてない=onMapReadyがまだ呼ばれてない時に呼ぶとエラー)
-            navigationMapFragment.setRoute(destination, origin, new JSONObject(result));
+            navigationMapFragment.setRoute(GlobalAppInfoSingleton.getInstance().getDestination().getLatLng(), GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng(), new JSONObject(result));
             //インフォーメーション部(ナビゲーション画面の下半分)に、行程(xx交差点で曲がる)を設定する
             navigationInformationFragment.addGeofences(new JSONObject(result));
             //右に曲がるとかそういう指示を表示させるための準備
@@ -100,8 +100,8 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
         Intent intent = getIntent();
 
         //intentで受け取った目的地と出発地をセットする
-        destination = new LatLng(intent.getDoubleExtra("DestLat", 0.0), intent.getDoubleExtra("DestLng", 0.0));
-        origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
+//        destination = new LatLng(intent.getDoubleExtra("DestLat", 0.0), intent.getDoubleExtra("DestLng", 0.0));
+//        origin = new LatLng(intent.getDoubleExtra("OriginLat", 0.0), intent.getDoubleExtra("OriginLng", 0.0));
 
         targetTimePercent = intent.getIntExtra("TargetTimePercent", 0);
         Log.d("NavigationActivity", "TargetTimePercent: " + targetTimePercent);
@@ -112,7 +112,11 @@ public class NavigationControlActivity extends Activity implements GoogleMapsDir
         navigationInformationFragment = (NavigationInformationFragment) fragmentManager.findFragmentById(R.id.navigationInformationFragment);
 
         //ルートのセットを開始
-        this.setRoute(destination, origin);
+        if (GlobalAppInfoSingleton.getInstance().getDestination() == null || GlobalAppInfoSingleton.getInstance().getOrigin() == null) {
+            this.setRoute(new LatLng(36.37202, 140.475858), new LatLng(36.443232, 140.501526));
+        } else {
+            this.setRoute(GlobalAppInfoSingleton.getInstance().getDestination().getLatLng(), GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng());
+        }
     }
 
 

@@ -104,21 +104,12 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             //設定されてない時のデフォルトのと出発地
             if (GlobalAppInfoSingleton.getInstance().getOrigin() == null || GlobalAppInfoSingleton.getInstance().getDestination() == null) {
                 Toast.makeText(this, "DEST or ORIGIN is null!", Toast.LENGTH_SHORT).show();
-
-                intent.putExtra("DestLat", 36.37202);
-                intent.putExtra("DestLng", 140.475858);
-                intent.putExtra("OriginLat", 36.443232);
-                intent.putExtra("OriginLng", 140.501526);
+                //ここでなんかデフォルトの出発地などの設定をするとよいがしなくてもまぁよい
                 intent.putExtra("TargetTimePercent", settingMenuFragment.targetTimeParcent);
                 startActivity(intent);
                 return;
             }
 
-            //ナビゲーションに目的地と出発地の座標を渡す(オブジェクトのまま渡したいがちょっと面倒なので)
-            intent.putExtra("DestLat", GlobalAppInfoSingleton.getInstance().getDestination().getLatLng().latitude);
-            intent.putExtra("DestLng", GlobalAppInfoSingleton.getInstance().getDestination().getLatLng().longitude);
-            intent.putExtra("OriginLat", GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng().latitude);
-            intent.putExtra("OriginLng", GlobalAppInfoSingleton.getInstance().getOrigin().getLatLng().longitude);
             intent.putExtra("TargetTimePercent", settingMenuFragment.targetTimeParcent);
             startActivity(intent);
 
