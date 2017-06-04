@@ -235,7 +235,7 @@ public class SettingMenuFragment extends Fragment implements GoogleMapsDistanceM
             @Override
             public void onPostExecute(AttributedPhoto photo) {
                 super.onPostExecute(photo);
-
+                if (photo == null) return;
                 imageView.setImageBitmap(photo.bitmap);
             }
         }.execute(place.getId());
