@@ -14,6 +14,7 @@ import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class FusedLocationClientSingleton extends Application implements
     private FusedLocationProviderApi fusedLocationProviderApi;
 
     // LocationClient の代わりにGoogleApiClientを使います
-    private GoogleApiClient mGoogleApiClient;
+    public GoogleApiClient mGoogleApiClient;
 
     private boolean mResolvingError = false;    //GoogleApiClientのコネクション確立失敗時のフラグ
 
@@ -56,6 +57,8 @@ public class FusedLocationClientSingleton extends Application implements
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();

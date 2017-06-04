@@ -1,20 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?><!--- SettingMenuFragment(メニュー)で使うレイアウト -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
 
     <Button
         android:id="@+id/chooseDestinationButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose Distination" />
+        android:text="Choose Destination" />
 
-    <TextView
-        android:id="@+id/destinationInformation"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NO DESTINATION" />
+        android:orientation="horizontal"
+        android:layout_weight="0.18">
+
+        <TextView
+            android:id="@+id/indicator_dest"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:background="#ffcc00"
+            android:gravity="center"
+            android:text="DEST"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/destinationInformation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="NO DESTINATION" />
+
+
+            <ImageView
+                android:id="@+id/destinationImage"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/dummy1"
+                app:srcCompat="@color/cast_intro_overlay_button_background_color" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/chooseOriginButton"
@@ -22,11 +58,45 @@
         android:layout_height="wrap_content"
         android:text="Choose Origin" />
 
-    <TextView
-        android:id="@+id/originInformation"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NO ORIGIN" />
+        android:orientation="horizontal"
+        android:layout_weight="0.18">
+
+        <TextView
+            android:id="@+id/indicator_origin"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:background="#ffcc00"
+            android:gravity="center"
+            android:text="ORIGIN"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/originInformation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="NO DESTINATION" />
+
+
+            <ImageView
+                android:id="@+id/originImage"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/dummy1"
+                app:srcCompat="@color/cast_intro_overlay_button_background_color" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/startNavigation"
