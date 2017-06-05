@@ -89,6 +89,7 @@ public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions
     @Override
     protected void onProgressUpdate(PolylineOptions... polyline) {
         // ポリラインを描画する
+        polyline[0].color(0xff696969);
         mMap.addPolyline(polyline[0]);
         listner.onGhostLocationChanged(polyline[0]);
     }

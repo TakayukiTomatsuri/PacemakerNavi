@@ -216,6 +216,11 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
             // Drawing polyline in the Google Map for the i-th route
             if(lineOptions != null) {
+                //輪郭線をつけるため
+                lineOptions.width(lineOptions.getWidth() + 5.0f);
+                mMap.addPolyline(lineOptions);
+                lineOptions.width(lineOptions.getWidth() - 5.0f);
+                lineOptions.color(0xFFFFFFFF);
                 mMap.addPolyline(lineOptions);
             }
             else {
