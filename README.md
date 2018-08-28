@@ -3,17 +3,29 @@ A navigation app with setting your pace in running (or driving).
   
 目標時刻までに目的地に到達することを支援するナビアプリです。
 残念ながら音声はでません。
-地図上に、理想的な移動スピードを表すゴースト（レースゲームで出て来る半透明のアレ）を黒いラインで表示しています。 
+地図上に、理想的な移動スピードを表すゴースト（レースゲームで出て来る半透明のアレ）を紅白ラインで表示しています。 
 
-![Alt apptop](/readmeImages/apptop.jpg)
-  
-まだ未実装ですが、到着時刻の編集と、右左折までの距離や、理想的な速度のコーチなどもする予定です。  
 
+
+### 案内設定画面
+出発地と目的地の設定、あと本来の到着時間(Google Mapsによる案内)のどのくらいの割合で到着するよう案内するかをシークバーで選びます。  
+(その地点にGoogle Maps上で投稿された写真がイメージとして表示されます)  
+<img src="/PacemakerNavi/readmeImages/image1112.png" style="zoom:0.7;">
+
+### 検索画面
+出発地や目的地を検索して選びます。  
+<img src="/PacemakerNavi/readmeImages/image111.png" style="zoom:0.7;">
+
+### ナビゲーション画面
+設定したペースでの案内をします。画面上に、ナビゲーションが理想の移動ペースで描かれていくのでその通りに移動すれば、好きなペースで目的地へ向かうことができます。(できるのか？)  
+下に出ているのは端末の現在の速度と平均速度、ゴースト(案内ライン)の速度です。
+<img src="/PacemakerNavi/readmeImages/image1113.png" style="zoom:0.4;">
+   
 ## 動作説明
 利用するだけの場合は、この欄の説明は読まなくても大丈夫。飛ばしてください。  
-![Alt appflow](/readmeImages/appflow.png)
+![Alt appflow](/PacemakerNavi/readmeImages/appflow.png)
   
-上の図のようになってます。Activityが画面全体のコントロールをして、Fragmentが画面上のパーツのレイアウトとコントロールを持っているような感じです。  
+上の図のようになってます。Activityが画面全体のコントロールをして、Fragmentが画面上のパーツのレイアウトとコントロールを持っている感じです。*当たり前体操?*  
 
 
 ## 要件
