@@ -34,7 +34,7 @@
         <!-- This API Key is invalidated. Pleas make new key for [Distance Matrix API, Maps SDK for Android, Places SDK for Android, Places API] in Google API Console.   -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58" />
+            android:value="INVALID_API_KEY_DU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58" />
 
         <activity
             android:name=".MainActivity"
