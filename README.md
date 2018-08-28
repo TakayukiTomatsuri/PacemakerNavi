@@ -33,7 +33,10 @@ AndroidStudioがあれば動くと思います。
 Mac版のAndroidStudio2.3.2を使用、実機での確認はAndroid6.0のHuawei Mediapad m3だけでしかしていません。
 
 ## 使い方
-Android StudioなどにGithubからクローンします。Mac版ではメニューバーのVCS>Git>Cloneからできるはずです。
-あとはメニューバーのRun>Run appを選択し、起動したい機種を選べばok。
-
+Android StudioなどにGithubからクローンします。Mac版ではメニューバーのVCS>Git>Cloneからできるはずです。  
+  
+API keyが無いと動作しません。Google Cloud Consoleで、[Distance Matrix API, Maps SDK for Android, Places SDK for Android, Places API]を有効化したAPI keyを作成して、`/Users/user1/github/PacemakerNavi/app/src/main/AndroidManifest.xml`にあるダミーのAPI keyを書き換えてください。  
+  
+あとはメニューバーのRun>Run appを選択し、起動したい機種を選べばok。  
 アプリを起動し、目的地などをセットしないままStartNaviボタンを押すと、規定の目的地/出発地でナビを開始します。
+

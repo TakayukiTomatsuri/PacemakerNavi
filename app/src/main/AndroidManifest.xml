@@ -31,6 +31,7 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
+        <!-- This API Key is invalidated. Pleas make new key for [Distance Matrix API, Maps SDK for Android, Places SDK for Android, Places API] in Google API Console.   -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDU1GHY5SXQT7-3rVsQBkZBpOUKw2vdx58" />
