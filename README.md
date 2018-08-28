@@ -23,7 +23,7 @@ A navigation app with setting your pace in running (or driving).
    
 ## 動作説明
 利用するだけの場合は、この欄の説明は読まなくても大丈夫。飛ばしてください。  
-![Alt appflow](/PacemakerNavi/readmeImages/appflow.png)
+![Alt appflow](/readmeImages/appflow.png)
   
 上の図のようになってます。Activityが画面全体のコントロールをして、Fragmentが画面上のパーツのレイアウトとコントロールを持っている感じです。*当たり前体操?*  
 
