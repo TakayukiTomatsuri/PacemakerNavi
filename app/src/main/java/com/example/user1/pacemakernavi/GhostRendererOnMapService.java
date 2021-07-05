@@ -30,8 +30,9 @@ import java.util.List;
 
 //時間経過にしたがって、ゴーストの軌跡を伸ばしていく。
 //伸ばすスピードは、ステップにかかる時間と、ステップを表すポリラインに含まれる点の数によって変えていく。(下のdoInBackground内のintervalTimeの定義を参照)
-public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOptions, Void> {
+public class GhostRendererOnMapService extends AsyncTask<String, PolylineOptions, Void> {
     GoogleMap mMap = null;
+    int targetTimePercent = 0;
 
     public GhostRendererOnMapService(GoogleMap map) {
         super();
@@ -45,11 +46,13 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
     }
 
     // 別スレッド処理
-    protected Void doInBackground(JSONObject... json) {
+    protected Void doInBackground(String... params) {
+        targetTimePercent = Integer.parseInt(params[1]);
         PolylineOptions polyline = new PolylineOptions();
         try {
+            JSONObject json = new JSONObject(params[0]);
             //stepsを抽出
-            JSONArray jsonSteps = json[0].getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
+            JSONArray jsonSteps = json.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
 
             //全ステップに関して
             for (int stepsIndex = 0; stepsIndex < jsonSteps.length(); stepsIndex++) {
@@ -60,12 +63,13 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
                 List<LatLng> polylinePoints = DataParser.decodePoly(encodedPolyline);
 
                 //更新までの間隔。(そのステップにかかる時間)/(そのステップに含まれるポリラインの点の数)をステップごとに変える。
-                int intervalTime = time / polylinePoints.size() * 1000;
-                Log.d("GHOST", "interval: "+intervalTime);
+                //起動時に渡された、「通常時の何パーセントの時間で到達するのか」の値で時間を短くしている。(targetTimePercentが80なら、0.08倍する、のように)
+                int intervalTime = (int) ((time / polylinePoints.size() * 1000 * targetTimePercent) * 0.01);
+                Log.i("GHOST", "interval: " + intervalTime);
 
                 //このステップに含まれるポリライン上の全ての点に対して
                 for (int pointsIndex = 0; pointsIndex < polylinePoints.size(); pointsIndex++) {
-                    Log.d("GHOST", "addPoint  stepIndex: " + stepsIndex +  " /"+ jsonSteps.length() +" pointIndex: " +pointsIndex +" /" + polylinePoints.size());
+                    Log.i("GHOST", "addPoint  stepIndex: " + stepsIndex + " /" + jsonSteps.length() + " pointIndex: " + pointsIndex + " /" + polylinePoints.size());
                     //一定時間待ってポリラインに点を追加
                     Thread.sleep(intervalTime);
                     polyline.add(polylinePoints.get(pointsIndex));
@@ -76,8 +80,6 @@ public class GhostRendererOnMapService extends AsyncTask<JSONObject, PolylineOpt
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //voidにしたらなんかエラーがでたような気がするのでStringを意味もなく渡す
         return null;
     }
 

@@ -3,6 +3,7 @@ package com.example.user1.pacemakernavi;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +15,9 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.vision.text.Text;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,18 +31,23 @@ import java.util.ArrayList;
 //ナビゲーション画面画面の下半分。行程や速度などを表示したい...
 public class NavigationInformationFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     TextView instructionField; //行程の指示(xx交差点で右)の表示部
     JSONArray jsonSteps; //行程(ルート検索で帰って来るJSONでいうsteps)
     int stepsIndex = 0; //行程のインデックス
 
     private GoogleApiClient locationClient = null;
+    private float ghostSpeed = 0;   //速度の表示に使うだけの値
     ArrayList<Geofence> mGeofenceList = new ArrayList<>(); //行程のエンドポイントに到達したかどうかを判断するためのジオフェンスたち
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         stepsIndex = 0;
+
+        //位置情報更新を通知してもらえるようにする
+        FusedLocationClientSingleton.getInstance().addListner(this);
 
         //GoogleApiClientの作成
         locationClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
@@ -51,17 +59,18 @@ public class NavigationInformationFragment extends Fragment implements
 
     //行程のエンドポイントに到達したかどうかを判定するジオフェンスを追加する
     public void addGeofences(JSONObject route) {
-        final int radius = 50;
+        final int radius = 20;
 
         try {
             jsonSteps = route.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
             //ジオフェンスは一度に100個以上は登録できないので、一応お知らせする
             if (jsonSteps.length() >= 100) {
-                Log.d("NaviInfoFragment", "Too many steps in route!");
+                Log.e("NaviInfoFragment", "Too many steps in route!");
                 return;
             }
             //setpsのエンドポイントの位置を全て登録していく
             for (int i = 0; i < jsonSteps.length(); i++) {
+                Log.d("NaviInfoFragment", jsonSteps.getJSONObject(stepsIndex).getString("html_instructions"));
                 JSONObject endLocation = jsonSteps.getJSONObject(i).getJSONObject("end_location");
                 //Geofenceの作成
                 mGeofenceList.add(new Geofence.Builder()
@@ -82,13 +91,19 @@ public class NavigationInformationFragment extends Fragment implements
     //呼ぶたびに行程を一個ずつ進める。何番目の行程、とか指定した方がいいかもしれない。
     public void changeSteps() {
         if (stepsIndex >= jsonSteps.length()) {
-            Log.d("NaviInfoFragment", "Steps is over. You have reached the destination.");
+            Log.e("NaviInfoFragment", "Steps is over. You have reached the destination.");
             return;
         }
 
         try {
-            //行程の指示の表示を
+            //行程の指示の表示を更新
             instructionField.setText(jsonSteps.getJSONObject(stepsIndex).getString("html_instructions"));
+            //ゴーストの速度(ただの数字の表示用)を更新
+            JSONObject jsonDuration = jsonSteps.getJSONObject(stepsIndex).getJSONObject("duration");
+            JSONObject jsonDistance = jsonSteps.getJSONObject(stepsIndex).getJSONObject("distance");
+            //単位はm/s。
+            ghostSpeed = (float) jsonDistance.getInt("value") / jsonDuration.getInt("value");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,9 +127,8 @@ public class NavigationInformationFragment extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
-
+        //xx交差点を右、とかいう指示を表示するテキストフィールド
         instructionField = (TextView) getActivity().findViewById(R.id.instruction);
-
     }
 
 
@@ -142,5 +156,26 @@ public class NavigationInformationFragment extends Fragment implements
 
     }
 
+    //画面に表示する、進む速度を更新
+    public void setUserSpeed(float speed) {
+        //速度評価の許容範囲
+        //TODO: 移動手段や速度によって許容範囲を変える。(歩きなら0.5程度だが自転車など速い移動手段を使うならもっと広げるべき)
+        float tolerance = 0.5f;
 
+        TextView userSpeedInfo = (TextView) getActivity().findViewById(R.id.speed);
+        String text = "YOUR: " + speed + "m/s    GHOST: " + ghostSpeed + "m/s\n";
+
+        //速度によって、ペース通りかどうか評価を変える。
+        if (speed > ghostSpeed + tolerance) text += "TOO FAST! SLOW DOWN";
+        else if (speed >= ghostSpeed - tolerance) text += "GOOD PACE";
+        else text += "HURRY UP! YOU ARE LATE";
+
+        userSpeedInfo.setText(text);
+    }
+
+    //移動したら進んでる速度を更新
+    @Override
+    public void onLocationChanged(Location location) {
+        setUserSpeed(location.getSpeed());
+    }
 }

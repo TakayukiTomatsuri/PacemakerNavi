@@ -5,13 +5,28 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.vision.text.Text;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 /**
@@ -25,9 +40,8 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
     private Place destination = null;   //セットされた目的地
     private Place origin = null;    //セットされた出発地
     private boolean isChoosingDistination = true;   //現在、目的地or出発地のどちらをセットしている段階か
-    final int REQUEST_LOCATION = 1;
-    //セッティングメニューはアプリの中で常に一つ
-    SettingMenuFragment settingMenuFragment = new SettingMenuFragment();
+    final int REQUEST_LOCATION = 1; //requestCode。コールバックメソッド内で、どっから帰ってきたのかの識別に使うっぽい
+    SettingMenuFragment settingMenuFragment = new SettingMenuFragment();    //セッティングメニューはアプリの中で常に一つ
     //PlacePickerは選択のたび生成/破棄されるみたいなのでここで生成しない
     //PlacePickerFragment placePickerFragment = new PlacePickerFragment();
 
@@ -53,11 +67,19 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
 
         // 最後にcommitしないと反映されない!
         transaction.commit();
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //TODO: onCreateだと時間的に準備が整っていないのでこっちでやってるが、onStart()はライフサイクル的にはリスタートされた後にも呼ばれる。なるべく一度しか呼ばれないところに移すべき。
     }
 
     //PlacePicker上で目的地が選択された場合に呼ばれるコールバックメソッド(使い方あってる...?)
     public void onPlacePickerFragmentChosen(Place chosenPlace){
-        Log.i("AAA", "PlacePicked!");
+        Log.d("MainActivity", "PlacePicked!");
         //SettingMenu画面の目的地/出発地情報を変更します
         if(isChoosingDistination){
             destination = chosenPlace;
@@ -67,12 +89,17 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             origin = chosenPlace;
             settingMenuFragment.setOriginInfo(chosenPlace);
         }
+
+        //時間と距離の表示
+        if (origin != null && destination != null) {
+            settingMenuFragment.setDirectionInformation(origin.getLatLng(), destination.getLatLng());
+        }
     }
 
     //SettingMenuFragment上のボタンが押された時に呼ばれるコールバックメソッド
     public  void onClickSettingMenuButton(View buttonView){
         if(buttonView.getId()==R.id.startNavigation){
-            Log.i("MainActivity", "CALL START NAVI");
+            Log.d("MainActivity", "CALL START NAVI");
             //ナビゲーション画面に移行する
             Intent intent = new Intent(MainActivity.this, NavigationControlActivity.class);
 
@@ -84,6 +111,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
                 intent.putExtra("DestLng", 140.475858);
                 intent.putExtra("OriginLat", 36.443232);
                 intent.putExtra("OriginLng", 140.501526);
+                intent.putExtra("TargetTimePercent", settingMenuFragment.targetTimeParcent);
                 startActivity(intent);
                 return;
             }
@@ -93,6 +121,7 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
             intent.putExtra("DestLng", destination.getLatLng().longitude);
             intent.putExtra("OriginLat", origin.getLatLng().latitude);
             intent.putExtra("OriginLng", origin.getLatLng().longitude);
+            intent.putExtra("TargetTimePercent", settingMenuFragment.targetTimeParcent);
             startActivity(intent);
 
             return;
@@ -117,6 +146,8 @@ public class MainActivity extends Activity implements  PlacePickerFragment.Place
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+
 
 
 }

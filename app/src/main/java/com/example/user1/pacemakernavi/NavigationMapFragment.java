@@ -118,51 +118,32 @@ public class NavigationMapFragment extends Fragment implements OnMapReadyCallbac
 
     //-----目的地までのルートを取得するための機能たち----//
     //ルートを設定し描画する。ルートは親のNavigationControlActivityがルートを検索してくれ、検索結果のJSONが渡される。
-    public void setRoute(Place destination, Place origin, JSONObject routeResult) {
-        //目的地/出発地が設定されてない
-        if(destination == null || origin ==null ) {
-            Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
-            //return;
-        }
-        if(mMap == null) Log.i("MAP", "mMap == null!");
-
-        Log.i("NaviMapFragment", "addMarker");
-        mMap.addMarker(new MarkerOptions().position(destination.getLatLng()).title("DEST"));
-        mMap.addMarker(new MarkerOptions().position(origin.getLatLng()).title("ORIGIN"));
-        Log.i("NaviMapFragment", "addedMarker");
-
-        ParserTask parserTask = new ParserTask();
-        // Invokes the thread for parsing the JSON data
-        parserTask.execute(routeResult.toString());
-
-        //出発地にズームイン
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin.getLatLng(), 11));
-    }
-
-    //デバッグ用。上のメソッドの、PlaceではなくLatLngで目的地・出発地を渡す版
     public void setRoute(LatLng destination, LatLng origin, JSONObject routeResult) {
         //目的地/出発地が設定されてない
         if(destination == null || origin ==null ) {
-            Log.i("NaviMapFragment", "DEST or ORIGIN is not set.");
+            Log.w("NaviMapFragment", "DEST or ORIGIN is not set.");
             //return;
         }
-        if(mMap == null) Log.i("MAP", "mMap == null!");
+        if (mMap == null) Log.e("MAP", "mMap == null!");
 
-        Log.i("NaviMapFragment", "addMarker");
         mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
         mMap.addMarker(new MarkerOptions().position(origin).title("ORIGIN"));
-        Log.i("NaviMapFragment", "addedMarker");
 
         ParserTask parserTask = new ParserTask();
         // Invokes the thread for parsing the JSON data
         parserTask.execute(routeResult.toString());
 
         //出発地にズームイン
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 11));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 11));
+
     }
 
     //以下は、　https://www.androidtutorialpoint.com/intermediate/google-maps-draw-path-two-points-using-google-directions-google-map-android-api-v2/
     //からのコピペ
+
+    //DirectionAPIの結果のJSONから、エンコードされたポリラインを取り出し、デコードする。
 
     /**
      * A class to parse the Google Places in JSON format

@@ -33,4 +33,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="START NAVI" />
+
+    <TextView
+        android:id="@+id/distanceInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DURATION: n/a       DISTANCE: n/a" />
+
+    <SeekBar
+        android:id="@+id/timebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progress="100" />
+
+    <TextView
+        android:id="@+id/targetTimeInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TARGET DURATION: n/a (00%)" />
+
 </LinearLayout>
